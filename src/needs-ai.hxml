@@ -1,0 +1,6 @@
+-cp lib/needs-ai-lib
+#-lib needs-ai
+
+-js ../bin/js/game.js
+
+-main Main
