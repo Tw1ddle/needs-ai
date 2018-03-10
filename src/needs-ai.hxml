@@ -1,6 +1,8 @@
 -cp lib/needs-ai-lib
 #-lib needs-ai
 
+-lib threejs
+
 -js ../bin/js/game.js
 
 -main Main
