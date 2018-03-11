@@ -16,6 +16,10 @@ branches:
   only:
     - master
 
+# Install dependencies
+install:
+  - haxelib install threejs
+
 # Build the demo
 script:
   - pushd src
