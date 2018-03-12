@@ -16,6 +16,8 @@ class WorldGenerator {
 		var humans:Array<Human> = [];
 		var zombies:Array<Zombie> = [];
 		
+		humans.push(new Human());
+		
 		return world;
 	}
 }

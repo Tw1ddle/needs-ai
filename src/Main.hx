@@ -19,7 +19,7 @@ class Main {
 	private static var lastAnimationTime:Float = 0.0; // Last time from requestAnimationFrame
 	private static var dt:Float = 0.0; // Frame delta time
 	
-	private var world:World;
+	static public var world(default, null):World;
 	
 	private static function main():Void {
 		new Main();
