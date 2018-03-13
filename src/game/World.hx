@@ -15,13 +15,30 @@ import js.three.PointLight;
 import js.three.Scene;
 import js.three.WebGLRenderer;
 
+class LogicalWorld {
+	public var humans:Array<Human> = [];
+	public var zombies:Array<Zombie> = [];
+	
+	public function new() {
+		humans.push(new Human());
+	}
+	
+	public function update(dt:Float):Void {
+		for (human in humans) {
+			human.update(dt);
+		}
+		for (zombie in zombies) {
+			zombie.update(dt);
+		}
+	}
+}
+
 class World {
 	private var camera:OrthographicCamera;
 	private var renderer:WebGLRenderer;
 	private var scene:Scene;
 	
-	private var humans:Array<Human>;
-	private var zombies:Array<Zombie>;
+	private var logicalWorld:LogicalWorld = new LogicalWorld();
 	
 	public function new(containerId:String, width:Int, height:Int) {
 		var container:DivElement = cast Browser.window.document.getElementById(containerId);
@@ -63,6 +80,8 @@ class World {
 	}
 	
 	public function update(dt:Float):Void {
+		logicalWorld.update(dt);
+		
 		renderer.render(scene, camera);
 	}
 }
