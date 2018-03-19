@@ -1,3 +1,6 @@
 [submodule "src/lib/needs-ai-lib"]
 	path = src/lib/needs-ai-lib
 	url = https://github.com/Tw1ddle/needs-ai-lib
+[submodule "needs-ai-editor"]
+	path = needs-ai-editor
+	url = https://github.com/Tw1ddle/needs-ai-editor
