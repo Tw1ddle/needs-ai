@@ -1,5 +1,7 @@
 package game;
 
+#if js
+
 import game.npcs.humans.Human;
 import game.npcs.zombies.Zombie;
 import js.Browser;
@@ -85,3 +87,5 @@ class World {
 		renderer.render(scene, camera);
 	}
 }
+
+#end

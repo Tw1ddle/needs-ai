@@ -5,7 +5,7 @@ import game.ai.ids.ActionSetId;
 import game.ai.ids.BrainId;
 import game.ai.ids.ConsiderationId;
 import game.ai.ids.ReasonerId;
-import game.ai.inputs.InputId;
+import game.ai.ids.InputId;
 import game.npcs.Brainable;
 import needs.ai.Brain;
 

@@ -1,4 +1,4 @@
-package game.ai.inputs;
+package game.ai.ids;
 
 enum InputId {
 	PerceivedZombieThreatInput;

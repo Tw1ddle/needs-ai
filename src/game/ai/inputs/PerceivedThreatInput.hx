@@ -1,8 +1,9 @@
 package game.ai.inputs;
 
 import game.World;
-import needs.inputs.Input;
+import game.ai.ids.InputId;
 import needs.responses.Response;
+import needs.inputs.Input;
 
 class PerceivedThreatInput implements Input<InputId> {
 	public var id(default, null):InputId;
