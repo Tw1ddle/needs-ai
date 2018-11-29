@@ -14,10 +14,13 @@ import needs.ai.Brain;
 import needs.ai.Consideration;
 import needs.ai.Reasoner;
 import needs.responses.Linear;
+import needs.util.Signal.Signal2;
 
 class Human extends NPC {
-	public function new() {
-		super();
+	public var onActionChanged(default, null) = new Signal2<Action<ActionId, ConsiderationId, InputId>, Action<ActionId, ConsiderationId, InputId>>();
+	
+	public function new(x:Float = 0, y:Float = 0) {
+		super(x, y);
 		
 		var zombieThreatInput = new PerceivedThreatInput(InputId.PerceivedZombieThreatInput, this, Main.world);
 		var humanStrengthInput = new PerceivedThreatInput(InputId.PerceivedHumanStrengthInput, this, Main.world);
@@ -47,7 +50,12 @@ class Human extends NPC {
 		var selfChatterActionSet = new ActionSet(ActionSetId.SelfChatter, "Human Self Chattering Action Set", []);
 		var talkingReasoner = new Reasoner(ReasonerId.Talking, "Human Talking Reasoner", [ groupChatterActionSet, selfChatterActionSet ]);
 		
-		brains.push(new Brain(BrainId.Human, [gameplayReasoner, talkingReasoner]));
+		var humanBrain = new Brain(BrainId.Human, [gameplayReasoner, talkingReasoner]);
+		humanBrain.onActionChanged.connect((reasoner, fromAction, toAction)-> {
+			trace("Human brain action changed for reasoner " + reasoner + " from action " + fromAction + " to action " + toAction);
+			onActionChanged.dispatch(fromAction, toAction);
+		});
+		brains.push(humanBrain);
 	}
 	
 	override public function update(dt:Float):Void {

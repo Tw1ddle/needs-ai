@@ -5,7 +5,7 @@ import game.ai.ids.InputId;
 import needs.inputs.Input;
 import needs.responses.Response;
 
-class PerceivedThreatInput implements Input<InputId> {
+class PerceivedPresenceInput implements Input<InputId> {
 	public var id(default, null):InputId;
 	public var referencePoint(default, null):Positionable;
 	public var world(default, null):World;

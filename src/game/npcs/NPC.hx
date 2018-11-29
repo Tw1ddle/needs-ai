@@ -8,11 +8,31 @@ import game.ai.ids.ReasonerId;
 import game.ai.ids.InputId;
 import game.npcs.Brainable;
 import needs.ai.Brain;
+import needs.util.Signal.Signal0;
+import needs.util.Signal.Signal2;
+
+enum PersonalityTraits
+{
+	AGGRESSIVE(amount:Int);
+	AIMLESS;
+	CHEERFUL;
+	CRAZY;
+	DARING(amount:Int);
+	FEARFUL(amount:Int);
+	GUNLOVING(amount:Int);
+	PARANOID;
+	PATIENT;
+	QUIET;
+	WATCHFUL(amount:Int);
+}
 
 class NPC implements Positionable implements Brainable {
 	public var brains(default, null):Array<Brain<BrainId, ReasonerId, ActionSetId, ActionId, ConsiderationId, InputId>> = [];
 	public var x:Float;
 	public var y:Float;
+	public var characteristics:Array<PersonalityTraits>; // Factors/traits that modify the NPC's personality (and thus their considerations of inputs etc)
+	
+	public var onMoved = new Signal2<Float, Float>();
 	
 	public var thinksPerSecond:Float;
 	public var thinkTimeAccumulator:Float;
@@ -21,6 +41,7 @@ class NPC implements Positionable implements Brainable {
 		this.x = x;
 		this.y = y;
 		
+		characteristics = [];
 		thinksPerSecond = 0.5;
 		thinkTimeAccumulator = Math.random() * thinksPerSecond; // Stagger the thinking over period so not all NPCs have to think at the same time/frame
 	}
@@ -32,6 +53,12 @@ class NPC implements Positionable implements Brainable {
 			think();
 			thinkTimeAccumulator = 0;
 		}
+	}
+	
+	public function setPosition(x:Float, y:Float):Void {
+		this.x = x;
+		this.y = y;
+		onMoved.dispatch(this.x, this.y);
 	}
 	
 	private function think():Void {

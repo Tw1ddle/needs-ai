@@ -4,8 +4,18 @@
 		<meta charset="UTF-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width,user-scalable=yes,initial-scale=1,maximum-scale=1">
-		<title>Needs AI</title>
+		<title>Needs AI - Utility Artificial Intelligence Demo With Utility-Driven Agents</title>
 		<meta name="author" content="Sam Twidale">
+		<meta name="description" content="This utility based artificial intelligence game drives autonomous agents using utility-theory based logic.">
+		<meta name="keywords" content="artificial intelligence, AI, utility, utility theory, needs-based, needs AI, IAUS, utility systems">
+		<meta name="subject" content="Utility Based AI">
+		<meta name="robots" content="index, follow">
+		<link rel="canonical" href="https://www.samcodes.co.uk/project/needs-ai/" />
+		<meta property="og:title" content="Needs AI - Utility Based AI Demo">
+		<meta property="og:description" content="Demo that animates autonomous agents using utility-theory based AI">
+		<meta property="og:site_name" content="Samcodes">
+		<meta name="twitter:title" content="Needs AI - Utility Based AI Demo">
+		<meta name="twitter:description" content="Demo that animates autonomous agents using utility-theory based AI">
 		<link rel="icon" type="image/x-icon" href="icon/favicon.png">
 		<link rel="apple-touch-icon-precomposed" type="image/x-icon" href="icon/apple-touch-icon-precomposed.png">
 		<!--[if IE]><link rel="shortcut icon" type="image/x-icon" href="icon/favicon.ico"><![endif]-->
@@ -15,14 +25,51 @@
 	<body>
 		<section id="header">
 			<div class="inner">
-				<h1>Needs AI - WORK IN PROGRESS</h1>
+				<h1>Needs AI</h1>
+				<h2>Demonstrating utility-based artficial intelligence</h2>
 				
-				<div id="game"></div>
+				<a href="https://github.com/Tw1ddle/needs-ai" target="_blank">
+					<img class="logo" src="https://github.com/Tw1ddle/needs-ai/blob/master/screenshots/logo.png?raw=true" alt="utility-based needs AI icon, artificial intelligence game and library logo">
+				</a>
+				
+				<p><a href="https://github.com/Tw1ddle/needs-ai" target="_blank">Needs AI</a> drives autonomous agents with <a href="https://en.wikipedia.org/wiki/Utility_system" target="_blank">utility-based</a> artificial intelligence. A fully <a href="https://github.com/Tw1ddle/needs-ai" target="_blank">open source</a> demo written by <a href="https://twitter.com/Sam_Twidale" target="_blank">Sam Twidale</a>.</p>
+				
+				<div id="game" class="container stitched" oncontextmenu="return false;"></div>
 				
 			</div>
 		</section>
+		
+		<!-- Options and filters -->
+		<section id="accordion">
+			<div>
+				<input type="checkbox" id="check-1">
+				<h2><label for="check-1">Settings</label></h2>
+				
+				<div class="settings">
+					
+				</div>
+			</div>
+		</section>
+		
+		<br>
+		
+		<div class="container stitched">
+			<h2 id="agents">Agent States</h2>
+			<h2>TODO</h2>
+		</div>
+		
+		<br>
+		
+		<br>
+		
+		<div class="container stitched">
+			<h2>How It Works</h2>
+			<p>WORK IN PROGRESS. This page uses a <a href="https://en.wikipedia.org/wiki/Utility_system" target="_blank">utility AI</a> to control autonomous agents, a simple but effective approach to modeling behaviours for NPCs in games.</p>
+			<p>This AI was written using <a href="https://haxe.org/" target="_blank">Haxe</a>. If you have any suggestions, requests or comments then <a href="https://twitter.com/Sam_Twidale" target="_blank">contact me</a> or open an <a href="https://github.com/Tw1ddle/needs-ai" target="_blank">issue</a>.</p>
+		</div>
 				
 		<script type="text/javascript" src="js/three.min.js"></script>
+		<script type="text/javascript" src="js/orbitcontrols.js"></script>
 		<script type="text/javascript" src="js/game.js"></script>
 	</body>
 </html>
