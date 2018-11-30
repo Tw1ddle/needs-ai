@@ -26,13 +26,13 @@
 		<section id="header">
 			<div class="inner">
 				<h1>Needs AI</h1>
-				<h2>Demonstrating utility-based artficial intelligence</h2>
+				<h2>Utility-based artificial intelligence</h2>
 				
 				<a href="https://github.com/Tw1ddle/needs-ai" target="_blank">
 					<img class="logo" src="https://github.com/Tw1ddle/needs-ai/blob/master/screenshots/logo.png?raw=true" alt="utility-based needs AI icon, artificial intelligence game and library logo">
 				</a>
 				
-				<p><a href="https://github.com/Tw1ddle/needs-ai" target="_blank">Needs AI</a> drives autonomous agents with <a href="https://en.wikipedia.org/wiki/Utility_system" target="_blank">utility-based</a> artificial intelligence. A fully <a href="https://github.com/Tw1ddle/needs-ai" target="_blank">open source</a> demo written by <a href="https://twitter.com/Sam_Twidale" target="_blank">Sam Twidale</a>.</p>
+				<p><a href="https://github.com/Tw1ddle/needs-ai" target="_blank">Needs AI</a> drives autonomous agents with <a href="https://en.wikipedia.org/wiki/Utility_system" target="_blank">utility-based</a> artificial intelligence. An <a href="https://github.com/Tw1ddle/needs-ai" target="_blank">open source</a> demo written by <a href="https://twitter.com/Sam_Twidale" target="_blank">Sam Twidale</a>.</p>
 				
 				<div id="game" class="container stitched" oncontextmenu="return false;"></div>
 				
@@ -54,7 +54,15 @@
 		<br>
 		
 		<div class="container stitched">
-			<h2 id="agents">Agent States</h2>
+			<h2 id="storysofar">The Story</h2>
+			<h2>TODO</h2>
+		</div>
+		<div class="container stitched">
+			<h2 id="agents">Human States</h2>
+			<h2>TODO</h2>
+		</div>
+		<div class="container stitched">
+			<h2 id="agents">Zombie States</h2>
 			<h2>TODO</h2>
 		</div>
 		
@@ -64,8 +72,13 @@
 		
 		<div class="container stitched">
 			<h2>How It Works</h2>
-			<p>WORK IN PROGRESS. This page uses a <a href="https://en.wikipedia.org/wiki/Utility_system" target="_blank">utility AI</a> to control autonomous agents, a simple but effective approach to modeling behaviours for NPCs in games.</p>
-			<p>This AI was written using <a href="https://haxe.org/" target="_blank">Haxe</a>. If you have any suggestions, requests or comments then <a href="https://twitter.com/Sam_Twidale" target="_blank">contact me</a> or open an <a href="https://github.com/Tw1ddle/needs-ai" target="_blank">issue</a>.</p>
+			<p>This page uses a <a href="https://en.wikipedia.org/wiki/Utility_system" target="_blank">utility AI</a> to control autonomous agents, in this case humans and zombies in the game world. Use the mouse to interact with the humans and zombies and watch the chaos unfold.</p>
+			<p>AI where NPCs consider their own needs leads to convincing awareness of their environments and autonomous behaviours without the need for brittle scripting. Utility-based AI works for many types of game.</p>
+			<p>The basic hierarchy is as follows: AI agents have Brains. Brains contain Reasoners. Reasoners contain ActionSets. ActionSets contain Considerations. Considerations (also known as Axes) hold Inputs, measurable aspects of the game world, and a way for an agent to consider (evaluate) the Inputs.</p>
+			<p>When it is time for an agent to think using their Brains, the available Actions are scored by evaluating their associated Considerations, and the best scoring actions are chosen through a strategy encapsulated by the ActionSets and Reasoners.</p>
+			<p>The challenging part of using a utility-based AI is the amount of design work and balancing needed to produce the behaviour you want. For example, an Input such as the distance from zombies must factor into human Considerations, but it may depend on the person.</p>
+			<p>Another challenging area is making Inputs available in a performant way, like how to represent generalized distances between objects, influence maps, elapsed times and other attributes.</p>
+			<p>This AI demo was written using <a href="https://haxe.org/" target="_blank">Haxe</a>. If you have any suggestions, requests or comments then <a href="https://twitter.com/Sam_Twidale" target="_blank">contact me</a> or open an <a href="https://github.com/Tw1ddle/needs-ai" target="_blank">issue</a>.</p>
 		</div>
 				
 		<script type="text/javascript" src="js/three.min.js"></script>

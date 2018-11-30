@@ -141,7 +141,7 @@ class World {
 		camera.updateProjectionMatrix();
 		scene.add(camera);
 		
-		var controls = new OrbitControls(camera);
+		var controls = new OrbitControls(camera, renderer.domElement);
 		
 		var grid = new GridHelper(150, 150);
 		scene.add(grid);
