@@ -20,6 +20,7 @@ branches:
 
 # Install dependencies
 install:
+  - haxelib install markov-namegen
   - haxelib install threejs
 
 # Build the demo
