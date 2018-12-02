@@ -1,6 +1,6 @@
 @font-face {
     font-family: "runescapeuf";
-    src: url("assets/fonts/runescape_uf.ttf");
+    src: local("../assets/fonts/runescape_uf.woff"), url("../assets/fonts/runescape_uf.woff") format('woff');
 }
 
 #game {
@@ -295,12 +295,16 @@ a:hover {
 }
 
 .textlabel {
+	display: inline-block;
 	color: #000000;
-	font-family: "Fira Mono", Monaco, "Andale Mono", "Lucida Console", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace;
-	margin: -5px 0 0 15px;
+	font-size: 24px;
+	color: #ffff00;
+	font-family: 'runescapeuf', Fallback, sans-serif;
+	text-shadow: 2px 2px 2px #000;
 	pointer-events:none;
 	zIndex: 1;
 	width: 100px;
-	height: 100px;
+	height: auto;
 	position: absolute;
+	text-align: center;
 }

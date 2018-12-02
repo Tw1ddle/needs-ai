@@ -23,8 +23,6 @@ class TextLabel
 		label = js.Browser.document.createDivElement();
 		label.className = "textlabel";
 		label.style.position = "absolute";
-		label.style.width = "100px";
-		label.style.height = "100px";
 		label.innerHTML = text;
 		label.style.zIndex = "1";
 		label.style.left = Std.string(x) + "px";
