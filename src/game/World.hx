@@ -30,6 +30,28 @@ import js.three.Group;
 import js.three.Intersection;
 import js.three.Object3D;
 
+// TODO things to add:
+
+// TODO vetos e.g. no ammo in weapon, therefore don't even consider shooting. or no movement, so don't consider any walking - let's us turn off things to consider easily
+// TODO realtime view of all utility values (possibly editable in realtime too, needs to be transferable for other games)
+
+// TODO invert awareness of actions by having the environment populate buckets for npcs
+// TODO add easy method for creating considerations for cost of distance/time
+// TODO make it easy to add hacks like "indoors consideration" to easily disable some things in certain areas e.g. throwing grenades indoors
+
+// Represents the visual representation of an object in the world
+class ShapeMesh {
+	public function new(userData:Dynamic = null, width:Float = 20, height:Float = 80, depth:Float = 20, x:Float = 0, y:Float = 0, z:Float = 0, color:Int = 0xffffff, specular:Int = 0xffffff) {
+		var geometry = new BoxGeometry(width, height, depth);
+		var material = new MeshPhongMaterial({ color: color, specular: specular, shininess: 0 });
+		mesh = new Mesh(geometry, material);
+		mesh.position.set(x, y + height / 2, z);
+		mesh.userData = userData;
+	}
+	
+	public var mesh:Mesh;
+}
+
 // Represents the logical state of the world
 class LogicalWorld {
 	private var humans:Array<Human> = [];
@@ -48,9 +70,6 @@ class LogicalWorld {
 		onZombieAdded.connect(world.onZombieAdded);
 		onZombieRemoved.connect(world.onZombieRemoved);
 		onNPCMoved.connect(world.onNPCMoved);
-		
-		addHuman(new Human(10, 10));
-		addZombie(new Zombie(-10, -10));
 	}
 	
 	public function update(dt:Float):Void {
@@ -62,38 +81,25 @@ class LogicalWorld {
 		}
 	}
 	
-	private function addHuman(human:Human) {
+	public function addHuman(human:Human) {
 		humans.push(human);
 		onHumanAdded.dispatch(human);
 	}
 	
-	private function removeHuman(human:Human) {
+	public function removeHuman(human:Human) {
 		humans.remove(human);
 		onHumanRemoved.dispatch(human);
 	}
 	
-	private function addZombie(zombie:Zombie) {
+	public function addZombie(zombie:Zombie) {
 		zombies.push(zombie);
 		onZombieAdded.dispatch(zombie);
 	}
 	
-	private function removeZombie(zombie:Zombie) {
+	public function removeZombie(zombie:Zombie) {
 		zombies.remove(zombie);
 		onZombieRemoved.dispatch(zombie);
 	}
-}
-
-// Represents the visual representation of an object in the world
-class ShapeMesh {
-	public function new(width:Float = 20, height:Float = 80, depth:Float = 20, x:Float = 0, y:Float = 0, z:Float = 0, color:Int = 0xffffff, specular:Int = 0xffffff) {
-		var geometry = new BoxGeometry(width, height, depth);
-		var material = new MeshPhongMaterial({ color: color, specular: specular, shininess: 0 });
-		mesh = new Mesh(geometry, material);
-		mesh.position.set(x, y + height / 2, z);
-		mesh.userData = this;
-	}
-	
-	public var mesh:Mesh;
 }
 
 // Represents the rendering state of the world (logical state is an internal component)
@@ -103,8 +109,9 @@ class World {
 	public var container(default, null):DivElement = null;
 	private var renderer:WebGLRenderer = null;
 	private var scene:Scene = null;
+	private var labels:TextLabels = null;
 	
-	private var logicalWorld:LogicalWorld = null;
+	public var logicalWorld(default, null):LogicalWorld = null;
 	
 	private var npcs = new ObjectMap<NPC, ShapeMesh>();
 	
@@ -135,32 +142,53 @@ class World {
 		
 		var aspect = width / height;
 		camera = new OrthographicCamera(-width / 2 * aspect, width / 2 * aspect, height / 2, -height / 2, 1, 10000);
-		camera.zoom = 20;
+		camera.zoom = 50;
 		camera.position.set(100, 100, 100);
 		camera.lookAt(scene.position);
 		camera.updateProjectionMatrix();
+		
 		scene.add(camera);
 		
 		var controls = new OrbitControls(camera, renderer.domElement);
+		controls.maxPolarAngle = Math.PI / 2.2;
+		untyped controls.minZoom = 5;
+		untyped controls.maxZoom = 100;
+		untyped controls.zoomSpeed = 5;
+		controls.enableKeys = false;
 		
-		var grid = new GridHelper(150, 150);
+		logicalWorld = new LogicalWorld(this);
+		
+		var grid = new GridHelper(100, 100);
 		scene.add(grid);
 		
 		scene.add(npcGroup);
 		
-		logicalWorld = new LogicalWorld(this);
+		labels = new TextLabels(container);
+		
+		function screenX(x:Float):Float {
+			return ((x + 1.0) * width) / 2;
+		}
+		function screenY(y:Float):Float {
+			return ((2.0 - y) * height) / 2;
+		}
 		
 		npcIntersectionChecker = new IntersectionChecker(camera, npcGroup.children, renderer.domElement);
-		npcIntersectionChecker.onIntersectionChanged.connect((last, current)-> {
-			
+		npcIntersectionChecker.onIntersectionChanged.connect((last, current, x, y)-> {
 		});
-		npcIntersectionChecker.onEnter.connect((entered)-> {
-			
+		npcIntersectionChecker.onEnter.connect((entered, x, y)-> {
+			var m = labels.mouseLabel;
+			var npc = entered.userData;
+			m.text = npc.name;
+			m.x = screenX(x);
+			m.y = screenY(y);
 		});
-		npcIntersectionChecker.onExit.connect((exited)-> {
-			
+		npcIntersectionChecker.onExit.connect((exited, x, y)-> {
+			var m = labels.mouseLabel;
+			m.text = "";
+			m.x = -1000;
+			m.y = -1000;
 		});
-		npcIntersectionChecker.onClicked.connect((o)-> {
+		npcIntersectionChecker.onClicked.connect((o, x, y)-> {
 			//o.userData.mesh.position.x += Math.random() * 5; // TODO
 		});
 	}
@@ -180,12 +208,12 @@ class World {
 	}
 	
 	public function onHumanAdded(human:Human):Void {
-		var shape = new ShapeMesh(0.5, 1.8, 0.5, human.x, 0, human.y, 0x55FF55);
+		var shape = new ShapeMesh(human, 1.0, 1.8, 1.0, human.x, 0, human.y, 0x55FF55);
 		npcGroup.add(shape.mesh);
 	}
 	
 	public function onZombieAdded(zombie:Zombie):Void {
-		var shape = new ShapeMesh(0.5, 1.6, 0.5, zombie.x, 0, zombie.y, 0xDD1111);
+		var shape = new ShapeMesh(zombie, 1.0, 1.6, 1.0, zombie.x, 0, zombie.y, 0xDD1111);
 		npcGroup.add(shape.mesh);
 	}
 	
@@ -195,6 +223,22 @@ class World {
 	
 	public function onZombieRemoved(zombie:Zombie):Void {
 		npcGroup.remove(npcs.get(zombie).mesh);
+	}
+	
+	public function addHuman(human:Human) {
+		logicalWorld.addHuman(human);
+	}
+	
+	public function removeHuman(human:Human) {
+		logicalWorld.removeHuman(human);
+	}
+	
+	public function addZombie(zombie:Zombie) {
+		logicalWorld.addZombie(zombie);
+	}
+	
+	public function removeZombie(zombie:Zombie) {
+		logicalWorld.removeZombie(zombie);
 	}
 }
 

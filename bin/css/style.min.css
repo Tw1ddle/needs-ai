@@ -1,3 +1,12 @@
+@font-face {
+    font-family: "runescapeuf";
+    src: url("assets/fonts/runescape_uf.ttf");
+}
+
+#game {
+    display: inline-block;
+}
+
 body {
     font-family: 'Open Sans', sans-serif;
     background-color: #000000;
@@ -248,53 +257,50 @@ a:hover {
     margin: 15px;
 }
 
-#patternfileedit {
-	text-transform: lowercase;
-    resize: none;
-    min-width: 80vw;
-    min-height: 150px;
-    max-height: 400px;
-    border: 3px solid #cccccc;
-    padding: 5px;
-    background-position: bottom right;
-    background-repeat: no-repeat;
+.xaxis path {
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges
+}
+.xaxis .axis-label {
+	font-size: 10px
+}
+.yaxis path {
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges
+}
+.yaxis .axis-label {
+	font-size: 10px
+}
+.title {
+	font-weight: bold;
+	font-size: 10px
+}
+.tick {
+	font-weight: bold;
+	font-size: 10px
+}
+.tick line {
+	stroke: gray;
+	opacity: 0.6
 }
 
-#game {
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
+#graphs {
+	display: block;
+	text-align: center
+}
+#graphs_container {
+	text-align: center
 }
 
-.patternpreviewcontainer {
-	margin: 10px 10px 10px 10px;
-	
-}
-
-.previewcanvas {
-	margin: 10px 10px 10px 10px;
-	border-color: transparent;
-	border-style: solid;
-	border-width: 10px;
-	
-	image-rendering: optimizeSpeed;             /* Older versions of FF          */
-	image-rendering: -moz-crisp-edges;          /* FF 6.0+                       */
-	image-rendering: -webkit-optimize-contrast; /* Safari                        */
-	image-rendering: -o-crisp-edges;            /* OS X & Windows Opera (12.02+) */
-	image-rendering: pixelated;                 /* Awesome future-browsers       */
-	-ms-interpolation-mode: nearest-neighbor;   /* IE                            */
-}
-
-.previewcanvashighlight {
-	border-color: yellow;
-}
-
-#usedpatternscontainer {
-	display: flex;
-	justify-content:center;
-	flex-flow: row wrap;
-	flex-wrap: wrap;
+.textlabel {
+	color: #000000;
+	font-family: "Fira Mono", Monaco, "Andale Mono", "Lucida Console", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace;
+	margin: -5px 0 0 15px;
+	pointer-events:none;
+	zIndex: 1;
+	width: 100px;
+	height: 100px;
+	position: absolute;
 }

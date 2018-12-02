@@ -10,6 +10,8 @@ import game.npcs.zombies.EverydayZombie;
 import haxe.ds.ObjectMap;
 import needs.util.Signal.Signal0;
 import needs.util.Signal.Signal1;
+import needs.util.Signal.Signal3;
+import needs.util.Signal.Signal4;
 import js.Browser;
 import js.html.DivElement;
 import js.three.AmbientLight;
@@ -38,10 +40,10 @@ class IntersectionChecker {
 	private var ray:Vector3 = new Vector3();
 	private var raycaster:Raycaster = new Raycaster();
 	public var lastObject(default, null):Object3D = null;
-	public var onIntersectionChanged(default, null) = new Signal2<Object3D, Object3D>();
-	public var onEnter(default, null) = new Signal1<Object3D>();
-	public var onExit(default, null) = new Signal1<Object3D>();
-	public var onClicked(default, null) = new Signal1<Object3D>();
+	public var onIntersectionChanged(default, null) = new Signal4<Object3D, Object3D, Float, Float>();
+	public var onEnter(default, null) = new Signal3<Object3D, Float, Float>();
+	public var onExit(default, null) = new Signal3<Object3D, Float, Float>();
+	public var onClicked(default, null) = new Signal3<Object3D, Float, Float>();
 	
 	public function new(camera:OrthographicCamera, objects:Dynamic, element:Dynamic) {
 		this.camera = camera;
@@ -59,7 +61,7 @@ class IntersectionChecker {
 			
 			var obj = checkIntersection();
 			if (obj != null) {
-				onClicked.dispatch(obj);
+				onClicked.dispatch(obj, mouseX, mouseY);
 			}
 		});
 	}
@@ -79,13 +81,13 @@ class IntersectionChecker {
 			return lastObject;
 		}
 		
-		onIntersectionChanged.dispatch(lastObject, currentObject);
+		onIntersectionChanged.dispatch(lastObject, currentObject, mouseX, mouseY);
 		
 		if (lastObject != null) {
-			onExit.dispatch(lastObject);
+			onExit.dispatch(lastObject, mouseX, mouseY);
 		}
 		if (currentObject != null) {
-			onEnter.dispatch(currentObject);
+			onEnter.dispatch(currentObject, mouseX, mouseY);
 		}
 		
 		lastObject = currentObject;

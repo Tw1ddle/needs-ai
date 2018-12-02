@@ -55,6 +55,7 @@ class Human extends NPC {
 			trace("Human brain action changed for reasoner " + reasoner + " from action " + fromAction + " to action " + toAction);
 			onActionChanged.dispatch(fromAction, toAction);
 		});
+		
 		brains.push(humanBrain);
 	}
 	

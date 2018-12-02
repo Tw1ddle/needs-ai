@@ -1,6 +1,7 @@
 -cp lib/needs-ai-lib
 #-lib needs-ai
 
+-lib markov-namegen
 -lib threejs
 
 -js ../bin/js/game.js

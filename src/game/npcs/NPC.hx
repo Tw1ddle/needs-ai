@@ -1,5 +1,6 @@
 package game.npcs;
 
+import game.Nameable;
 import game.ai.ids.ActionId;
 import game.ai.ids.ActionSetId;
 import game.ai.ids.BrainId;
@@ -10,6 +11,7 @@ import game.npcs.Brainable;
 import needs.ai.Brain;
 import needs.util.Signal.Signal0;
 import needs.util.Signal.Signal2;
+import game.Global;
 
 enum PersonalityTraits
 {
@@ -26,11 +28,12 @@ enum PersonalityTraits
 	WATCHFUL(amount:Int);
 }
 
-class NPC implements Positionable implements Brainable {
+class NPC implements Positionable implements Brainable implements Nameable {
 	public var brains(default, null):Array<Brain<BrainId, ReasonerId, ActionSetId, ActionId, ConsiderationId, InputId>> = [];
 	public var x:Float;
 	public var y:Float;
 	public var characteristics:Array<PersonalityTraits>; // Factors/traits that modify the NPC's personality (and thus their considerations of inputs etc)
+	public var name:String = Global.namegen.generate()[0]; // TODO
 	
 	public var onMoved = new Signal2<Float, Float>();
 	
