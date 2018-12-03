@@ -1,0 +1,16 @@
+talking brain has reasoners has actionsets has actions has considerations has inputs
+
+talking brain has reasoners, has categories of speech, has specific utterances, has considerations, for appropriateness has inputs (context)
+has cooldown based on length of time since last utterance
+considers how many people nearby are talking
+considers responses based on the characteristics of the last nearby utterance, and how many people nearby are talking
+
+utterances have:
+
+text content
+source
+tone modifiers
+volume/reach modifiers
+an effect i.e. the listener needs to know the message category and any effects it has (use tags for this)
+direction (whose direction is it directed at)
+cooldown/debuff time based on since the last time the utterance was used

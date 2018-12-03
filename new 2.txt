@@ -1,0 +1,268 @@
+Building a better centaur AI:
+
+Dave Mark does AI consulting, working on guildwars 2 etc.
+Mike Lewis gameplay programmer at guildwars also
+
+Project was for an MMO:
+ * Concepts will work for all sorts of games, RPG etc
+ * Components simple to implement
+ * Hooking it up to your engines and your world is the hard bit
+
+Disclaimer:
+ * All about the architecture
+ * Powers Guildwars 2 expansion, heart of thorns
+ * Some of the behaviors are in HoT, not everything in HoT - all about what the architecture is capable of
+ * Architecture to power future of arenanet
+
+Mandate was:
+ * AI execution - better use of character skills, more intelligent. Better character movement,
+ better environmental awareness, wider variety of behavior archetypes, mitigate exploits of old AI,
+ better performance and less memory usage.
+ * Designer quality of life - support more actions, more autonomous behavior (less scripting), less brittle
+ behaviors, faster development time!
+
+So for iteration speed, we wanted data driven architecture
+ * Design tool, "Duo" 
+ * Distinction between code and content - essentially external XML data, designer-editable, configures the code,
+ provides parameters, allow recombination of prefab code elements - unfortunately all static (no runtime changes).
+ * Code implements building blocks, consumes content to know what to do, not how. Dynamic, elements can be recombined
+ at runtime - maintains changing state data.
+
+Architectural components:
+* Infinite Axis Utility System (IAUS) -> Decision Making (Dave Mark's stuff)
+* Modular influence maps -> World information
+* Content tagging -> Contextual information (info about world in general)
+* IK Headlook -> Better presence in the world (characters can look places)
+
+IAUS overview:
+ * Actions have a set of considerations (axes)
+ * Each consideration has input, parameters
+ * Parameters have a curve type, parameter values (response curves)
+ * Most importantly all inputs are normalized, x-range runs from 0-1. Some data is normalized e.g. health %,
+ but some isn't. So we define bookends - 0 is the least we care about, 1 is the most we care about. Clamp within
+ this range. Parametrize the bookends to mean what we care about - e.g. distance from 0-30m.
+ * We have as many axes as we care about, we combine by multiplying them together to get a score.
+
+Each action is scored. Actions are scored on a per-target basis. All possible actions with all possible targets
+get a score. Scored actions are pushed onto a list and the best scoring action is chosen according to some
+strategy.
+
+* Compensation factor may be useful because as you multiply normalized values, the total drops
+* Many high-scoring considerations reduce the score dramatically!
+* Punishes you for having more considerations, so multiplication isn't ideal for that...
+
+(Makes me question why we want to use multiplication anyway, why not add + average?)
+
+Inputs
+ * Character data objects
+ - Mine
+ - Targets
+ Game engine
+ - Distance between objects
+ - Elapsed time
+ * Influence map system
+
+We can predefine a lot of these inputs - literally put them as options in an editor rather than in code if
+necessary.
+
+Input implementation:
+ * Decision "context"
+ - A package of information:
+  * A decision identifier (what are you trying to do?)
+  * Intelligence Controller object (who is asking?)
+  * Link to content data with parameters (what do you need?)
+  * Optional link to context object (who are we doing the action to?)
+
+Consideration (an axis)
+ * Maps inputs into decisions
+ * As many as we need, "infinite number"
+ * Normalized (0...1)
+
+Components:
+* Name or description (what does this mean/do?)
+* Input (what info are we processiing?)
+* Response curve parameters
+* Input parameters (min, max, tags, cooldowns etc)
+
+For example:
+ "Not when I'm too close"
+ "Distance"
+ "Polynomial Curve..."
+ "0, 10, blah"
+
+Visual editing of data:
+ * View of polynomial curve in a nice little graph editor right within the design editor
+
+ * Response curves should have presets like "normal linear", "normal logistic" etc etc - as defaults
+ We find ourselves using the defaults a lot, as good starting points.
+
+Decisions
+ * Decisions are linked to a code function
+ - Execute a skill, perform movement to a location, call an animation, run a script action (intent)
+
+Game-specific execution of an action
+ * Call skill code, run animation, set a destination and start moving
+ * All irrelevant to the AI system - just tell it to do something!
+ * Decision parameters - some require parameters e.g. emote name, run script (name)?
+ * All parameters within your design tool - script name, content tags...
+
+Decision score evaluator:
+ * Represents a decision process
+ - Evaluates inputs via considerations
+ - Score
+ - If selected, results in a decision
+ * Why am I doing that?
+ * Two types - skill, non-skill (associated or not associated with a skill) 
+ Common components: name, description, weight, considerations, optional tags ("useonallies" etc)
+
+Weights are an implicit, not explicit priority system - not guaranteed to stratify, just a multiplier
+to sort of roughly guide what actions are done e.g. idles = 1.0, emergencies = 5.0. Just makes more important
+stuff more likely to happen as a whole to get final scores.
+Even though outputs are normalized 0...1, doing final multiplication makes sure urgency is taken care of.
+
+In the code, the "bonus" score is the weight + momentum + other bonus factors.
+
+An agent has skills e.g.
+IntelligenceSkillsetEntry: skill = Pirate Sword Basic Slash (the animation etc), Evaluator = Common Melee - Base (a DSE)
+IntelligenceSKillsetEntry: skill = Basic Emote, Evaluator = emote DSE - base
+
+These entries are essentially the big resume that the agent can do in the world.
+
+Optimization:
+ * DSEs are sorted by weight, highest weight at the top
+ * Considerations inside DSEs are sorted by their likelihood to reduce score
+ * DSEs are discarded when we realize they can't possibly succeed. So the "most likely to succeed" actions area
+ is found first, so we can stop early - early outs. Basically bounded rationality by seeing if the decision has fallen
+ below another decision that was already checked for.
+ * Context limitations - range (4000 feet or whatever) etc
+
+Intelligence definition:
+ * A skill set
+ * A decision maker (a bunch of DSEs)
+ * Parameters for some behaviors
+ * Pathfinding preference profile
+ * Habitat definition
+All the rules you need to tell the creature how it's going to act in the world
+
+Decision maker packages - a collection of decision makers (modular sets of related stuff e.g.
+tavern actions/awareness). For example:
+ * Tavern has tripwire, adds the tavern behaviors to the NPC when they enter/leave the area.
+ * Adds a sense of context, so you only use certain things in some areas!
+ * Highly modular
+ 
+Influence maps:
+ * Representation of the world in terms of "influence"
+ * Removes a lot of n^2 problems
+ * Used to find a location, where to move, where to target a spell
+ * General area info, concentration of something? How big?
+
+Built of two components for influence maps:
+ * Knowledge representation, process of location and threat info. Storage of world info, basics of retrieval
+ * Modular construction, each layer is an atomic component. Algorithms for shaping data, combining them.
+
+* Influence falloff functions - proximity, centered on agents, where cold it move in 1 second? About 250" radius,
+linear falloff.
+* Threat - centered on agent, what could it attack right now? About 1200" radius. Different falloff.
+
+Essentially the character have maps around them. We can add these maps together to find info about how threatening
+a region is e.g. lots of monsters in one place, sampling threat around there == high threat!
+
+Grid-based system - original system used standard grid-based construction
+ * Covers whole game map.
+
+Agents would "stamp" templates into the world map for their faction
+ * Physical
+ * Threat
+ * Limitations - couldn't support a contextual aggro system!
+ * This approach works well for 2D, not for 3D with tunnels though.
+
+* Infinite resolution system
+- Store influence as a sparse set of points in 3D space. Each influence source has a falloff function
+* Influence at a point = sum of falloff functions for nearby sources. We do a bunch of calculus and find
+the best place etc.
+
+Modular construction
+ * Multiple layers of allies vs enemies, physical vs threat etc
+ * Combine parts of the layers together to get a variety of expressions of what's going on in the world
+ * Also a "Personal Interest Template" for characters, centered on the character, starts at 1, falls off to 0
+ at max range. Lets you multiply the scores to cull less interesting information to you.
+ * Useful for location information - enemy proximity, ally proximity, environmental hazards. Aggregate value about a location, good/bad.
+ * Locations can differ - you could ask "am I too crowded"? Useful for herding guards.
+
+Some DSE might be "avoid enemies that are too close to me!"
+ * Consideration: "when really close to enemies"
+DSE "move to melee range from long range"
+ * Consideration: "not when enough allies around target"
+
+Retrieving a location from system matching criteria - concentration, sparseness, conflict area?
+Returns a location with the highest/lowest value. Subject to my personal interest template!
+
+For example, a DSE: "maintain ranged weapons distance"
+Decision: "stay at range"
+ * Lowest enemy threat
+ * Still within my threat range
+ * Within my interest range
+
+Decision: "Stay at range (with spacing)"
+ * Lowest enemy threat
+
+Skill DSE: "Ranged AoE"
+ * Check for high enemy concentration. Get that center of enemy mass so we can hit max AoE damage, easily.
+ 
+Content Tags:
+ * Characters can be tagged - species level (all characters of a type), or individual (this guy only)
+ * Objects (gadgets)
+ * Points of interest, locations!
+
+How they can be tagged:
+ * Tags can be fed into the system from several places
+ - Content, almost any scripts, utility AI actions, arbitrary gcode/game logic
+ * Tags are aggregated onto a blackboard-style data structure
+ - Anything in the map can read/write data on this blackboard
+ * Several things read tags
+ - GetBonusFactor checks tags when scoring DSEs, scripts can look at tags.
+ 
+ Content tag uses: context filtering (only search contexts with matching tag e.g. points of interest in villages)
+ * Patrol points in/around fort only
+ * Qualify/disqualify behavior - don't use fire storm on creatures tagged as "fire based", salute emotes to officers only
+ * Adjust scores of behaviors
+ 
+ Priority boost and cut tags - built into every combat DSE - adjust final score of DSE. Can be situational or event driven!
+  * Leader points out preferred target
+  * Event-specified priority target
+  i.e. everything that we do with respect to this target, we'll amplify/cut by the boost tag.
+
+A nice touch was IK headlook - made it so all allies/enemies etc can look at everything, adds a lot of life to characters.
+Makes you feel like characters are aware of everything in the world.
+
+Building a creatures AI walkthrough:
+ * Create a skillset, assign skills to DSEs
+ * Create a decision maker - add all non-skill actions
+ 
+They've created hundreds of DSEs e.g. "Stay away from enemy threats - Base/Conservative/Brave"
+Just attach a DSE to an NPC and go!
+Some are specialized e.g. "Close to melee range"
+Designers can add them using the tooling!
+
+Higher level: Templates are pre-created decision makers
+All the required DSEs for basic behaviors
+A library of starter archetypes - * standard melee etc
+
+If a character exists, you can create a unique AI for a brand new creature in a matter of minutes.
+
+Start from nothing:
+ * Add skillsets
+ * Add a decision maker
+ * Sort them by order/priority
+ * Add a bit of description in
+
+It's dead simple because the design is modular.
+
+Mandate:
+* Better use of character skills, better movement, more environmental awareness, wider variety of behavior archetypes,
+migrate exploits of old AI, faster execution, support more actions, more autonomous behavior, less brittle behaviors, faster development time!
+
+Why an implicit ranking rather than explicit?
+ * The only way we can have an explicit ranking is to check all our emergencies, then do blah, then do blah
+ * But because scores are always fluctuating, you don't always want to do emergencies first. So it's better to have overlapping ranges and
+ manage those using tags/bonuses etc. A lot of extra fluidity that way. Reduced brittleness, didn't cause problems (but questioner said it caused a problem in the past)

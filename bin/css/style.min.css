@@ -303,7 +303,7 @@ a:hover {
 	text-shadow: 2px 2px 2px #000;
 	pointer-events:none;
 	zIndex: 1;
-	width: 100px;
+	width: 300px;
 	height: auto;
 	position: absolute;
 	text-align: center;

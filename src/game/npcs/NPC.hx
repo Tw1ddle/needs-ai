@@ -33,7 +33,7 @@ class NPC implements Positionable implements Brainable implements Nameable {
 	public var x:Float;
 	public var y:Float;
 	public var characteristics:Array<PersonalityTraits>; // Factors/traits that modify the NPC's personality (and thus their considerations of inputs etc)
-	public var name:String = Global.namegen.generate()[0]; // TODO
+	public var name:String = Global.namegen.generate(); // TODO
 	
 	public var onMoved = new Signal2<Float, Float>();
 	

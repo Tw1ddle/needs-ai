@@ -9,39 +9,14 @@ using StringTools;
 // Automatically reads training data from files into corresponding static arrays of strings in this class
 @:build(markov.util.TrainingDataBuilder.build("../embed/names"))
 @:keep
-class TrainingDatas {}
-
-// A set of name training data
-private class TrainingData {
-	public var value(default, null):String; // The "value" field in the select element
-	public var displayName(default, null):String; // The display name in the select element
-	public var data:Array<String>; // The training data itself
-
-	public inline function new(value:String, displayName:String, data:Array<String>) {
-		this.value = value;
-		this.displayName = displayName;
-		this.data = data;
-	}
-}
+class TrainingData {}
 
 class SharedNameGenerator {
-	private var trainingData:Array<TrainingData>; // The training data
-	
 	public function new() {
-		// Read in the training data
-		trainingData = new Array<TrainingData>();
-		for (name in ["American Forenames"]) {
-			var data = Reflect.field(TrainingDatas, name);
-			addTrainingData(name, data);
-		}
 	}
 	
-	public function generate():Array<String> {
-		return Generator.generate(trainingData[0].data);
-	}
-	
-	private inline function addTrainingData(displayName:String, data:Array<String>):Void {
-		trainingData.push(new TrainingData(displayName, displayName, data));
+	public function generate():String {
+		return Generator.generate(TrainingData.american_forenames)[0] + " " + Generator.generate(TrainingData.american_surnames)[0];
 	}
 }
 
