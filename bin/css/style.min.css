@@ -3,10 +3,6 @@
     src: local("../assets/fonts/runescape_uf.woff"), url("../assets/fonts/runescape_uf.woff") format('woff');
 }
 
-#game {
-    display: inline-block;
-}
-
 body {
     font-family: 'Open Sans', sans-serif;
     background-color: #000000;
@@ -294,16 +290,28 @@ a:hover {
 	text-align: center
 }
 
+#game_wrapper {
+	display: inline-block;
+	padding: 0;
+	margin: 0;
+}
+
+#game {
+    display: inline-block;
+	position: relative;
+	width: 800px;
+	height: 800px;
+}
+
 .textlabel {
 	display: inline-block;
-	color: #000000;
 	font-size: 24px;
 	color: #ffff00;
 	font-family: 'runescapeuf', Fallback, sans-serif;
 	text-shadow: 2px 2px 2px #000;
 	pointer-events:none;
 	zIndex: 1;
-	width: 300px;
+	width: auto;
 	height: auto;
 	position: absolute;
 	text-align: center;

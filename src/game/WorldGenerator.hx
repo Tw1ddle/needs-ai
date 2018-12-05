@@ -10,7 +10,7 @@ class WorldGenerator {
 	}
 	
 	public function create():World {
-		var world = new World("game", 800, 600);
+		var world = new World("game");
 		
 		return world;
 	}

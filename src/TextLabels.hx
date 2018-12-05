@@ -22,7 +22,6 @@ class TextLabel
 	public function new(text:String, x:Int, y:Int) {
 		label = js.Browser.document.createDivElement();
 		label.className = "textlabel";
-		label.style.position = "absolute";
 		label.innerHTML = text;
 		label.style.zIndex = "1";
 		label.style.left = Std.string(x) + "px";

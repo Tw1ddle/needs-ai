@@ -117,8 +117,11 @@ class World {
 	
 	private var npcGroup = new Group();
 	
-	public function new(containerId:String, width:Int, height:Int) {
+	public function new(containerId:String) {
 		container = cast Browser.window.document.getElementById(containerId);
+		
+		var width = container.offsetWidth;
+		var height = container.offsetHeight;
 		
 		var canvas = Browser.window.document.createCanvasElement();
 		canvas.width = width;
@@ -166,10 +169,10 @@ class World {
 		labels = new TextLabels(container);
 		
 		function screenX(x:Float):Float {
-			return ((x + 1.0) * width) / 2;
+			return ((x + 1.0) * width) / 2.0;
 		}
 		function screenY(y:Float):Float {
-			return ((2.0 - y) * height) / 2;
+			return ((1.0 - y) * height) / 2.0;
 		}
 		
 		npcIntersectionChecker = new IntersectionChecker(camera, npcGroup.children, renderer.domElement);

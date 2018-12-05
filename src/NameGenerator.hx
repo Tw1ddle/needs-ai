@@ -16,7 +16,7 @@ class SharedNameGenerator {
 	}
 	
 	public function generate():String {
-		return Generator.generate(TrainingData.american_forenames)[0] + " " + Generator.generate(TrainingData.american_surnames)[0];
+		return (Generator.generate(TrainingData.american_forenames)[0] + " " + Generator.generate(TrainingData.american_surnames)[0]).capitalizeWords();
 	}
 }
 

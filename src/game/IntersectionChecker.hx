@@ -1,4 +1,5 @@
 package game;
+import js.html.Element;
 
 #if js
 
@@ -45,19 +46,19 @@ class IntersectionChecker {
 	public var onExit(default, null) = new Signal3<Object3D, Float, Float>();
 	public var onClicked(default, null) = new Signal3<Object3D, Float, Float>();
 	
-	public function new(camera:OrthographicCamera, objects:Dynamic, element:Dynamic) {
+	public function new(camera:OrthographicCamera, objects:Dynamic, element:Element) {
 		this.camera = camera;
 		this.objects = objects;
 		element.addEventListener("mousemove", (e)->{
 			var rect = e.target.getBoundingClientRect();
-			mouseX = ((e.clientX - rect.left) / element.width) * 2 - 1;
-			mouseY = -((e.clientY - rect.top) / element.height) * 2 + 1;
+			mouseX = ((e.clientX - rect.left) / element.clientWidth) * 2 - 1;
+			mouseY = -((e.clientY - rect.top) / element.clientHeight) * 2 + 1;
 		});
 		
 		element.addEventListener("click", (e)-> {
 			var rect = e.target.getBoundingClientRect();
-			mouseX = ((e.clientX - rect.left) / element.width) * 2 - 1;
-			mouseY = -((e.clientY - rect.top) / element.height) * 2 + 1;
+			mouseX = ((e.clientX - rect.left) / element.clientWidth) * 2 - 1;
+			mouseY = -((e.clientY - rect.top) / element.clientHeight) * 2 + 1;
 			
 			var obj = checkIntersection();
 			if (obj != null) {
