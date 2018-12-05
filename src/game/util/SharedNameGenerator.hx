@@ -1,4 +1,4 @@
-package;
+package game.util;
 
 import markov.namegen.NameGenerator;
 import markov.util.PrefixTrie;

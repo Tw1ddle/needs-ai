@@ -1,34 +1,26 @@
 package game;
 
-#if js
-
-import needs.util.Signal.Signal2;
 import game.npcs.NPC;
 import game.npcs.humans.Human;
 import game.npcs.zombies.Zombie;
-import game.npcs.zombies.EverydayZombie;
+import game.util.TextLabels;
 import haxe.ds.ObjectMap;
-import needs.util.Signal.Signal0;
-import needs.util.Signal.Signal1;
 import js.Browser;
 import js.html.DivElement;
 import js.three.AmbientLight;
 import js.three.BoxGeometry;
 import js.three.Color;
+import js.three.FogExp2;
 import js.three.GridHelper;
+import js.three.Group;
 import js.three.Mesh;
 import js.three.MeshPhongMaterial;
+import js.three.OrbitControls;
 import js.three.OrthographicCamera;
 import js.three.PointLight;
 import js.three.Scene;
 import js.three.WebGLRenderer;
-import js.three.OrbitControls;
-import js.three.FogExp2;
-import js.three.Vector3;
-import js.three.Raycaster;
-import js.three.Group;
-import js.three.Intersection;
-import js.three.Object3D;
+import needs.util.Signal.Signal1;
 
 // TODO things to add:
 
@@ -109,7 +101,7 @@ class World {
 	public var container(default, null):DivElement = null;
 	private var renderer:WebGLRenderer = null;
 	private var scene:Scene = null;
-	private var labels:TextLabels = null;
+	private var labels:game.util.TextLabels = null;
 	
 	public var logicalWorld(default, null):LogicalWorld = null;
 	
@@ -166,7 +158,7 @@ class World {
 		
 		scene.add(npcGroup);
 		
-		labels = new TextLabels(container);
+		labels = new game.util.TextLabels(container);
 		
 		function screenX(x:Float):Float {
 			return ((x + 1.0) * width) / 2.0;
@@ -244,5 +236,3 @@ class World {
 		logicalWorld.removeZombie(zombie);
 	}
 }
-
-#end

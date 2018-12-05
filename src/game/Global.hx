@@ -1,6 +1,6 @@
 package game;
 
-import NameGenerator;
+import game.util.SharedNameGenerator;
 
 class Global
 {

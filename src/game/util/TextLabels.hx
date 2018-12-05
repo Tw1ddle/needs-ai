@@ -1,6 +1,4 @@
-package;
-
-#if js
+package game.util;
 
 import haxe.ds.ObjectMap;
 import haxe.ds.IntMap;
@@ -86,5 +84,3 @@ class TextLabels
 		return addLabel(LabelId.MOUSEOVER, "", 0, 0);
 	}
 }
-
-#end

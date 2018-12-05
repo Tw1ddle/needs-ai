@@ -1,7 +1,5 @@
 package;
 
-#if js
-
 import game.World;
 import game.WorldGenerator;
 import js.Browser;
@@ -72,5 +70,3 @@ class Main {
 		Browser.window.requestAnimationFrame(animate);
 	}
 }
-
-#end

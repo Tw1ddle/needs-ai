@@ -1,17 +1,16 @@
 package game.npcs;
 
+import game.Global;
 import game.Nameable;
 import game.ai.ids.ActionId;
 import game.ai.ids.ActionSetId;
 import game.ai.ids.BrainId;
 import game.ai.ids.ConsiderationId;
-import game.ai.ids.ReasonerId;
 import game.ai.ids.InputId;
+import game.ai.ids.ReasonerId;
 import game.npcs.Brainable;
 import needs.ai.Brain;
-import needs.util.Signal.Signal0;
 import needs.util.Signal.Signal2;
-import game.Global;
 
 enum PersonalityTraits
 {

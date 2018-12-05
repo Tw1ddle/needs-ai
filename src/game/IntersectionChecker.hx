@@ -1,37 +1,13 @@
 package game;
+
 import js.html.Element;
-
-#if js
-
-import needs.util.Signal.Signal2;
-import game.npcs.NPC;
-import game.npcs.humans.Human;
-import game.npcs.zombies.Zombie;
-import game.npcs.zombies.EverydayZombie;
-import haxe.ds.ObjectMap;
-import needs.util.Signal.Signal0;
-import needs.util.Signal.Signal1;
-import needs.util.Signal.Signal3;
-import needs.util.Signal.Signal4;
-import js.Browser;
-import js.html.DivElement;
-import js.three.AmbientLight;
-import js.three.BoxGeometry;
-import js.three.Color;
-import js.three.GridHelper;
-import js.three.Mesh;
-import js.three.MeshPhongMaterial;
-import js.three.OrthographicCamera;
-import js.three.PointLight;
-import js.three.Scene;
-import js.three.WebGLRenderer;
-import js.three.OrbitControls;
-import js.three.FogExp2;
-import js.three.Vector3;
-import js.three.Raycaster;
-import js.three.Group;
 import js.three.Intersection;
 import js.three.Object3D;
+import js.three.OrthographicCamera;
+import js.three.Raycaster;
+import js.three.Vector3;
+import needs.util.Signal.Signal3;
+import needs.util.Signal.Signal4;
 
 class IntersectionChecker {
 	private var mouseX:Null<Float> = null;
@@ -96,5 +72,3 @@ class IntersectionChecker {
 		return currentObject;
 	}
 }
-
-#end

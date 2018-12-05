@@ -1,10 +1,8 @@
 package;
 
-#if js
-
 import game.World;
-import needs.util.Signal.Signal1;
 import js.jquery.terminal.Terminal;
+import needs.util.Signal.Signal1;
 
 class Console
 {
@@ -47,5 +45,3 @@ class Console
 		Terminal.clear();
 	}
 }
-
-#end
