@@ -1,9 +1,10 @@
-package game;
+package game.world;
 
 import game.npcs.humans.Human;
 import game.npcs.zombies.Zombie;
+import game.world.World;
 
-@:access(game.World)
+@:access(game.world.World)
 class WorldGenerator {
 	public function new() {
 		

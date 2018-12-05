@@ -1,6 +1,6 @@
 package;
 
-import game.World;
+import game.world.World;
 import js.jquery.terminal.Terminal;
 import needs.util.Signal.Signal1;
 

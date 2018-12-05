@@ -1,7 +1,7 @@
 package;
 
-import game.World;
-import game.WorldGenerator;
+import game.world.World;
+import game.world.WorldGenerator;
 import js.Browser;
 
 class Main {

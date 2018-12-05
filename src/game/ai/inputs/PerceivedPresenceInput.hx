@@ -1,6 +1,6 @@
 package game.ai.inputs;
 
-import game.World;
+import game.world.World;
 import game.ai.ids.InputId;
 import needs.inputs.Input;
 import needs.responses.Response;

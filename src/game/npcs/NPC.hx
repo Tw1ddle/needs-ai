@@ -1,6 +1,6 @@
 package game.npcs;
 
-import game.Global;
+import game.util.Global;
 import game.Nameable;
 import game.ai.ids.ActionId;
 import game.ai.ids.ActionSetId;

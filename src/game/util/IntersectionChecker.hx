@@ -1,4 +1,4 @@
-package game;
+package game.util;
 
 import js.html.Element;
 import js.three.Intersection;

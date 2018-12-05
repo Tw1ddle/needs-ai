@@ -1,8 +1,9 @@
-package game;
+package game.world;
 
 import game.npcs.NPC;
 import game.npcs.humans.Human;
 import game.npcs.zombies.Zombie;
+import game.util.IntersectionChecker;
 import game.util.TextLabels;
 import haxe.ds.ObjectMap;
 import js.Browser;

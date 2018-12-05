@@ -1,4 +1,4 @@
-package game;
+package game.util;
 
 import game.util.SharedNameGenerator;
 
