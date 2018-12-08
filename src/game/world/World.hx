@@ -22,6 +22,9 @@ import js.three.PointLight;
 import js.three.Scene;
 import js.three.WebGLRenderer;
 import needs.util.Signal.Signal1;
+import js.three.Vector3;
+import js.three.Geometry;
+import SpeechSynth;
 
 // TODO things to add:
 
@@ -36,6 +39,7 @@ import needs.util.Signal.Signal1;
 class ShapeMesh {
 	public function new(userData:Dynamic = null, width:Float = 20, height:Float = 80, depth:Float = 20, x:Float = 0, y:Float = 0, z:Float = 0, color:Int = 0xffffff, specular:Int = 0xffffff) {
 		var geometry = new BoxGeometry(width, height, depth);
+		geometry.computeBoundingBox();
 		var material = new MeshPhongMaterial({ color: color, specular: specular, shininess: 0 });
 		mesh = new Mesh(geometry, material);
 		mesh.position.set(x, y + height / 2, z);
@@ -51,8 +55,8 @@ class LogicalWorld {
 	private var zombies:Array<Zombie> = [];
 	
 	public var onHumanAdded(default, null) = new Signal1<Human>();
-	public var onZombieAdded(default, null) = new Signal1<Zombie>();
 	public var onHumanRemoved(default, null) = new Signal1<Human>();
+	public var onZombieAdded(default, null) = new Signal1<Zombie>();
 	public var onZombieRemoved(default, null) = new Signal1<Zombie>();
 	
 	public var onNPCMoved(default, null) = new Signal1<NPC>();
@@ -167,22 +171,49 @@ class World {
 		function screenY(y:Float):Float {
 			return ((1.0 - y) * height) / 2.0;
 		}
+		function toScreen(x:Float, y:Float, z:Float):{x:Float, y:Float} {
+			var vector = new Vector3(x, y, z);
+			vector.project(camera);
+			return { x: screenX(vector.x), y: screenY(vector.y) };
+		}
 		
 		npcIntersectionChecker = new IntersectionChecker(camera, npcGroup.children, renderer.domElement);
 		npcIntersectionChecker.onIntersectionChanged.connect((last, current, x, y)-> {
 		});
+		
+		var temp = new Vector3(0, 0, 0);
 		npcIntersectionChecker.onEnter.connect((entered, x, y)-> {
-			var m = labels.mouseLabel;
+			// Put a label at the top of the bounding box of the mesh
+			
 			var npc = entered.userData;
-			m.text = npc.name;
-			m.x = screenX(x);
-			m.y = screenY(y);
+			var mesh:Mesh = cast entered;
+			var geometry:Geometry = mesh.geometry;
+			geometry.boundingBox.getCenter(temp);
+			var meshPos:Vector3 = mesh.position;
+			var pos = toScreen(meshPos.x + temp.x, meshPos.y + geometry.boundingBox.max.y, meshPos.z + temp.z);
+			
+			var label = labels.mouseLabel;
+			label.text = npc.name;
+			label.width = 500;
+			label.x = pos.x - label.width / 2;
+			label.y = pos.y;
+			
+			SpeechSynth.speak(npc.name, SpeechSynth.getVoiceByUri("Google UK English Male"), 1.0, 1.2, 1.1, 
+			()-> {
+				
+			},
+			()-> {
+				
+			},
+			()-> {
+				
+			});
 		});
 		npcIntersectionChecker.onExit.connect((exited, x, y)-> {
-			var m = labels.mouseLabel;
-			m.text = "";
-			m.x = -1000;
-			m.y = -1000;
+			var label = labels.mouseLabel;
+			label.text = "";
+			label.x = -1000;
+			label.y = -1000;
 		});
 		npcIntersectionChecker.onClicked.connect((o, x, y)-> {
 			//o.userData.mesh.position.x += Math.random() * 5; // TODO
