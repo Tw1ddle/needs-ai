@@ -1,6 +1,9 @@
 -cp lib/needs-ai-lib
 #-lib needs-ai
 
+-cp lib/MacroTween
+#-lib MacroTween
+
 -lib markov-namegen
 -lib threejs
 

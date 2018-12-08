@@ -1,5 +1,6 @@
 package game.world;
 
+import SpeechSynth;
 import game.npcs.NPC;
 import game.npcs.humans.Human;
 import game.npcs.zombies.Zombie;
@@ -12,6 +13,7 @@ import js.three.AmbientLight;
 import js.three.BoxGeometry;
 import js.three.Color;
 import js.three.FogExp2;
+import js.three.Geometry;
 import js.three.GridHelper;
 import js.three.Group;
 import js.three.Mesh;
@@ -20,11 +22,13 @@ import js.three.OrbitControls;
 import js.three.OrthographicCamera;
 import js.three.PointLight;
 import js.three.Scene;
-import js.three.WebGLRenderer;
-import needs.util.Signal.Signal1;
 import js.three.Vector3;
-import js.three.Geometry;
-import SpeechSynth;
+import js.three.WebGLRenderer;
+import macrotween.Ease;
+import macrotween.Timeline;
+import macrotween.Tween;
+import needs.util.Signal.Signal1;
+import needs.util.Signal.Signal5;
 
 // TODO things to add:
 
@@ -80,21 +84,25 @@ class LogicalWorld {
 	
 	public function addHuman(human:Human) {
 		humans.push(human);
+		human.onMoved.connect((x, y)-> { onNPCMoved.dispatch(human); });
 		onHumanAdded.dispatch(human);
 	}
 	
 	public function removeHuman(human:Human) {
 		humans.remove(human);
+		human.onMoved = [];
 		onHumanRemoved.dispatch(human);
 	}
 	
 	public function addZombie(zombie:Zombie) {
 		zombies.push(zombie);
+		zombie.onMoved.connect((x, y)-> { onNPCMoved.dispatch(zombie); });
 		onZombieAdded.dispatch(zombie);
 	}
 	
 	public function removeZombie(zombie:Zombie) {
 		zombies.remove(zombie);
+		zombie.onMoved = [];
 		onZombieRemoved.dispatch(zombie);
 	}
 }
@@ -106,13 +114,18 @@ class World {
 	public var container(default, null):DivElement = null;
 	private var renderer:WebGLRenderer = null;
 	private var scene:Scene = null;
-	private var labels:game.util.TextLabels = null;
+	private var labels:TextLabels = null;
 	
 	public var logicalWorld(default, null):LogicalWorld = null;
 	
 	private var npcs = new ObjectMap<NPC, ShapeMesh>();
 	
 	private var npcGroup = new Group();
+	
+	public var onNPCMovementAnimationStarted = new Signal5<NPC, Float, Float, Float, Float>();
+	public var onNPCMovementAnimationEnded = new Signal1<NPC>();
+	
+	private var npcMotionTweens = new Array<Tween>();
 	
 	public function new(containerId:String) {
 		container = cast Browser.window.document.getElementById(containerId);
@@ -198,7 +211,7 @@ class World {
 			label.x = pos.x - label.width / 2;
 			label.y = pos.y;
 			
-			SpeechSynth.speak(npc.name, SpeechSynth.getVoiceByUri("Google UK English Male"), 1.0, 1.2, 1.1, 
+			SpeechSynth.speak(npc.name, SpeechSynth.getVoiceByUri("Google UK English Male"), 1.0, 1.0, 1.0, 
 			()-> {
 				
 			},
@@ -216,7 +229,8 @@ class World {
 			label.y = -1000;
 		});
 		npcIntersectionChecker.onClicked.connect((o, x, y)-> {
-			//o.userData.mesh.position.x += Math.random() * 5; // TODO
+			var npc = o.userData;
+			npc.setPosition(npc.x + 1, npc.y);
 		});
 	}
 	
@@ -225,23 +239,30 @@ class World {
 		
 		npcIntersectionChecker.checkIntersection();
 		
+		for (tween in npcMotionTweens) {
+			tween.step(dt);
+		}
+		npcMotionTweens = [for (tween in npcMotionTweens) if (tween.isCurrentTimeInBounds()) tween];
+		
+		trace(npcMotionTweens);
+		
 		renderer.render(scene, camera);
 	}
 	
 	public function onNPCMoved(npc:NPC):Void {
-		var mesh:Mesh = npcs.get(npc).mesh;
-		mesh.position.x = npc.x;
-		mesh.position.y = npc.y;
+		startNPCMovementAnimation(npc);
 	}
 	
 	public function onHumanAdded(human:Human):Void {
 		var shape = new ShapeMesh(human, 1.0, 1.8, 1.0, human.x, 0, human.y, 0x55FF55);
 		npcGroup.add(shape.mesh);
+		npcs.set(human, shape);
 	}
 	
 	public function onZombieAdded(zombie:Zombie):Void {
 		var shape = new ShapeMesh(zombie, 1.0, 1.6, 1.0, zombie.x, 0, zombie.y, 0xDD1111);
 		npcGroup.add(shape.mesh);
+		npcs.set(zombie, shape);
 	}
 	
 	public function onHumanRemoved(human:Human):Void {
@@ -266,5 +287,15 @@ class World {
 	
 	public function removeZombie(zombie:Zombie) {
 		logicalWorld.removeZombie(zombie);
+	}
+	
+	private function startNPCMovementAnimation(npc:NPC):Void {
+		var mesh:Mesh = npcs.get(npc).mesh;
+		
+		onNPCMovementAnimationStarted.dispatch(npc, mesh.position.x, mesh.position.z, npc.x, npc.y);
+		
+		npcMotionTweens.push(Tween.tween(0, 1, [ mesh.position.x => npc.x, mesh.position.z => npc.y ], Ease.quadInOut));
+		
+		onNPCMovementAnimationEnded.dispatch(npc);
 	}
 }

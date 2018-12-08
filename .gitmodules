@@ -4,3 +4,6 @@
 [submodule "needs-ai-editor"]
 	path = needs-ai-editor
 	url = https://github.com/Tw1ddle/needs-ai-editor
+[submodule "src/lib/MacroTween"]
+	path = src/lib/MacroTween
+	url = https://github.com/JoeCreates/MacroTween

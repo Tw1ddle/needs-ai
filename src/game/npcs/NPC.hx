@@ -1,6 +1,5 @@
 package game.npcs;
 
-import game.util.Global;
 import game.Nameable;
 import game.ai.ids.ActionId;
 import game.ai.ids.ActionSetId;
@@ -9,6 +8,7 @@ import game.ai.ids.ConsiderationId;
 import game.ai.ids.InputId;
 import game.ai.ids.ReasonerId;
 import game.npcs.Brainable;
+import game.util.Global;
 import needs.ai.Brain;
 import needs.util.Signal.Signal2;
 
@@ -32,7 +32,7 @@ class NPC implements Positionable implements Brainable implements Nameable {
 	public var x:Float;
 	public var y:Float;
 	public var characteristics:Array<PersonalityTraits>; // Factors/traits that modify the NPC's personality (and thus their considerations of inputs etc)
-	public var name:String = Global.namegen.generate(); // TODO
+	public var name:String = Global.getRandomAmericanName();
 	
 	public var onMoved = new Signal2<Float, Float>();
 	

@@ -1,5 +1,6 @@
 package game.util;
 
+import haxe.ds.StringMap;
 import markov.namegen.NameGenerator;
 import markov.util.PrefixTrie;
 
@@ -11,16 +12,18 @@ using StringTools;
 @:keep
 class TrainingData {}
 
-class SharedNameGenerator {
-	public function new() {
-	}
-	
-	public function generate():String {
-		return (Generator.generate(TrainingData.american_forenames)[0] + " " + Generator.generate(TrainingData.american_surnames)[0]).capitalizeWords();
-	}
+typedef NameBatch = {
+	forenames : Array<String>,
+	surnames : Array<String>
 }
 
-class Generator {
+class SharedNameGenerator {
+	public static function makeAmericanNameBatch():NameBatch {
+		var forenames = generate(TrainingData.american_forenames);
+		var surnames = generate(TrainingData.american_surnames);
+		return { forenames : forenames, surnames : surnames };
+	}
+	
 	/*
 	 * Runs the name generator, returning a new batch of names
 	 */
