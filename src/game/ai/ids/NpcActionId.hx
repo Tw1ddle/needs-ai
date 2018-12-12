@@ -1,6 +1,6 @@
 package game.ai.ids;
 
-enum ActionId {
+enum NpcActionId {
 	Attack;
 	Retreat;
 	Panic;

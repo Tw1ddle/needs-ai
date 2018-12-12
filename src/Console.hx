@@ -22,6 +22,10 @@ class Console
 		world.logicalWorld.onZombieRemoved.connect((zombie)-> {
 			echo("(Zombie) " + zombie.name + " has departed");
 		});
+		
+		world.utteranceManager.onUtteranceRequested.connect((npc, what)-> {
+			echo(npc.name + " said: " + what);
+		});
 	}
 	
 	/*

@@ -1,6 +1,6 @@
 package game.ai.ids;
 
-enum ArchetypeId {
+enum NpcArchetypeId {
     HumanArchetype;
     ZombieArchetype;
 }

@@ -1,6 +1,5 @@
 package game.ai.ids;
 
-enum ReasonerId {
+enum NpcReasonerId {
 	Gameplay;
-	Talking;
 }

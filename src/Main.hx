@@ -43,10 +43,10 @@ class Main {
 		console.echo("Round starting...");
 		
 		for (human in humans) {
-			world.addHuman(human);
+			world.logicalWorld.addHuman(human);
 		}
 		for (zombie in zombies) {
-			world.addZombie(zombie);
+			world.logicalWorld.addZombie(zombie);
 		}
 	}
 	

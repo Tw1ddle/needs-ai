@@ -7,6 +7,7 @@ import js.html.SpeechSynthesisVoice;
 class SpeechSynth 
 {
 	public static var supported(get, never):Bool;
+	public static var loaded(get, never):Bool;
 	public static var voices(get, never):Array<SpeechSynthesisVoice>;
 	public static var speaking(get, never):Bool;
 	
@@ -76,6 +77,10 @@ class SpeechSynth
 			return [];
 		}
 		return voices;
+	}
+	
+	private static function get_loaded():Bool {
+		return supported && voices.length != 0;
 	}
 	
 	private static function get_speaking():Bool {

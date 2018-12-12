@@ -1,6 +1,6 @@
 package game.ai.ids;
 
-enum ActionSetId {
+enum NpcActionSetId {
 	Survival;
 	GroupChatter;
 	SelfChatter;

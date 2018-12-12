@@ -1,6 +1,6 @@
 package game.ai.ids;
 
-enum BrainId {
+enum NpcBrainId {
 	Human;
 	Zombie;
 }

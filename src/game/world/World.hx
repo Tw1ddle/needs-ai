@@ -1,11 +1,11 @@
 package game.world;
 
-import SpeechSynth;
 import game.npcs.NPC;
 import game.npcs.humans.Human;
 import game.npcs.zombies.Zombie;
 import game.util.IntersectionChecker;
 import game.util.TextLabels;
+import game.util.UtteranceManager;
 import haxe.ds.ObjectMap;
 import js.Browser;
 import js.html.DivElement;
@@ -25,19 +25,9 @@ import js.three.Scene;
 import js.three.Vector3;
 import js.three.WebGLRenderer;
 import macrotween.Ease;
-import macrotween.Timeline;
 import macrotween.Tween;
 import needs.util.Signal.Signal1;
 import needs.util.Signal.Signal5;
-
-// TODO things to add:
-
-// TODO vetos e.g. no ammo in weapon, therefore don't even consider shooting. or no movement, so don't consider any walking - let's us turn off things to consider easily
-// TODO realtime view of all utility values (possibly editable in realtime too, needs to be transferable for other games)
-
-// TODO invert awareness of actions by having the environment populate buckets for npcs
-// TODO add easy method for creating considerations for cost of distance/time
-// TODO make it easy to add hacks like "indoors consideration" to easily disable some things in certain areas e.g. throwing grenades indoors
 
 // Represents the visual representation of an object in the world
 class ShapeMesh {
@@ -53,60 +43,6 @@ class ShapeMesh {
 	public var mesh:Mesh;
 }
 
-// Represents the logical state of the world
-class LogicalWorld {
-	private var humans:Array<Human> = [];
-	private var zombies:Array<Zombie> = [];
-	
-	public var onHumanAdded(default, null) = new Signal1<Human>();
-	public var onHumanRemoved(default, null) = new Signal1<Human>();
-	public var onZombieAdded(default, null) = new Signal1<Zombie>();
-	public var onZombieRemoved(default, null) = new Signal1<Zombie>();
-	
-	public var onNPCMoved(default, null) = new Signal1<NPC>();
-	
-	public function new(world:World) {
-		onHumanAdded.connect(world.onHumanAdded);
-		onHumanRemoved.connect(world.onHumanRemoved);
-		onZombieAdded.connect(world.onZombieAdded);
-		onZombieRemoved.connect(world.onZombieRemoved);
-		onNPCMoved.connect(world.onNPCMoved);
-	}
-	
-	public function update(dt:Float):Void {
-		for (human in humans) {
-			human.update(dt);
-		}
-		for (zombie in zombies) {
-			zombie.update(dt);
-		}
-	}
-	
-	public function addHuman(human:Human) {
-		humans.push(human);
-		human.onMoved.connect((x, y)-> { onNPCMoved.dispatch(human); });
-		onHumanAdded.dispatch(human);
-	}
-	
-	public function removeHuman(human:Human) {
-		humans.remove(human);
-		human.onMoved = [];
-		onHumanRemoved.dispatch(human);
-	}
-	
-	public function addZombie(zombie:Zombie) {
-		zombies.push(zombie);
-		zombie.onMoved.connect((x, y)-> { onNPCMoved.dispatch(zombie); });
-		onZombieAdded.dispatch(zombie);
-	}
-	
-	public function removeZombie(zombie:Zombie) {
-		zombies.remove(zombie);
-		zombie.onMoved = [];
-		onZombieRemoved.dispatch(zombie);
-	}
-}
-
 // Represents the rendering state of the world (logical state is an internal component)
 class World {
 	private var npcIntersectionChecker:IntersectionChecker = null;
@@ -115,11 +51,11 @@ class World {
 	private var renderer:WebGLRenderer = null;
 	private var scene:Scene = null;
 	private var labels:TextLabels = null;
+	public var utteranceManager(default, null):UtteranceManager = null;
 	
 	public var logicalWorld(default, null):LogicalWorld = null;
 	
 	private var npcs = new ObjectMap<NPC, ShapeMesh>();
-	
 	private var npcGroup = new Group();
 	
 	public var onNPCMovementAnimationStarted = new Signal5<NPC, Float, Float, Float, Float>();
@@ -127,19 +63,19 @@ class World {
 	
 	private var npcMotionTweens = new Array<Tween>();
 	
-	public function new(containerId:String) {
+	public function new(containerId:String, widthInCells:Int, heightInCells:Int) {
 		container = cast Browser.window.document.getElementById(containerId);
 		
-		var width = container.offsetWidth;
-		var height = container.offsetHeight;
+		var containerWidth = container.offsetWidth;
+		var containerHeight = container.offsetHeight;
 		
 		var canvas = Browser.window.document.createCanvasElement();
-		canvas.width = width;
-		canvas.height = height;
+		canvas.width = containerWidth;
+		canvas.height = containerHeight;
 		
 		renderer = new WebGLRenderer({canvas:canvas, antialias:true});
 		renderer.sortObjects = true;
-		renderer.setSize(width, height);
+		renderer.setSize(containerWidth, containerHeight);
 		
 		container.appendChild(renderer.domElement);
 		
@@ -153,8 +89,8 @@ class World {
 		pointLight.position.set(0, 30, 0);
 		scene.add(pointLight);
 		
-		var aspect = width / height;
-		camera = new OrthographicCamera(-width / 2 * aspect, width / 2 * aspect, height / 2, -height / 2, 1, 10000);
+		var aspect = containerWidth / containerHeight;
+		camera = new OrthographicCamera(-containerWidth / 2 * aspect, containerWidth / 2 * aspect, containerHeight / 2, -containerHeight / 2, 1, 10000);
 		camera.zoom = 50;
 		camera.position.set(100, 100, 100);
 		camera.lookAt(scene.position);
@@ -164,14 +100,17 @@ class World {
 		
 		var controls = new OrbitControls(camera, renderer.domElement);
 		controls.maxPolarAngle = Math.PI / 2.2;
-		untyped controls.minZoom = 5;
+		untyped controls.minZoom = 10;
 		untyped controls.maxZoom = 100;
 		untyped controls.zoomSpeed = 5;
 		controls.enableKeys = false;
 		
-		logicalWorld = new LogicalWorld(this);
+		// TODO camera key controls
 		
-		var grid = new GridHelper(100, 100);
+		logicalWorld = new LogicalWorld(this, widthInCells, heightInCells);
+		
+		var gridSize = Std.int(Math.max(logicalWorld.width, logicalWorld.height));
+		var grid = new GridHelper(gridSize, gridSize); // Note the grid is square-shaped
 		scene.add(grid);
 		
 		scene.add(npcGroup);
@@ -179,10 +118,10 @@ class World {
 		labels = new game.util.TextLabels(container);
 		
 		function screenX(x:Float):Float {
-			return ((x + 1.0) * width) / 2.0;
+			return ((x + 1.0) * containerWidth) / 2.0;
 		}
 		function screenY(y:Float):Float {
-			return ((1.0 - y) * height) / 2.0;
+			return ((1.0 - y) * containerHeight) / 2.0;
 		}
 		function toScreen(x:Float, y:Float, z:Float):{x:Float, y:Float} {
 			var vector = new Vector3(x, y, z);
@@ -194,12 +133,12 @@ class World {
 		npcIntersectionChecker.onIntersectionChanged.connect((last, current, x, y)-> {
 		});
 		
-		var temp = new Vector3(0, 0, 0);
 		npcIntersectionChecker.onEnter.connect((entered, x, y)-> {
-			// Put a label at the top of the bounding box of the mesh
+			// Put the mouse label at the top of the bounding box of the mesh
 			
-			var npc = entered.userData;
+			var npc:NPC = entered.userData;
 			var mesh:Mesh = cast entered;
+			var temp = new Vector3(0, 0, 0);
 			var geometry:Geometry = mesh.geometry;
 			geometry.boundingBox.getCenter(temp);
 			var meshPos:Vector3 = mesh.position;
@@ -210,27 +149,48 @@ class World {
 			label.width = 500;
 			label.x = pos.x - label.width / 2;
 			label.y = pos.y;
-			
-			SpeechSynth.speak(npc.name, SpeechSynth.getVoiceByUri("Google UK English Male"), 1.0, 1.0, 1.0, 
-			()-> {
-				
-			},
-			()-> {
-				
-			},
-			()-> {
-				
-			});
 		});
 		npcIntersectionChecker.onExit.connect((exited, x, y)-> {
+			// Hide the mouse label
+			
 			var label = labels.mouseLabel;
 			label.text = "";
 			label.x = -1000;
 			label.y = -1000;
 		});
 		npcIntersectionChecker.onClicked.connect((o, x, y)-> {
+			// Move the NPC (testing...)
+			
 			var npc = o.userData;
 			npc.setPosition(npc.x + 1, npc.y);
+		});
+		
+		utteranceManager = new UtteranceManager();
+		utteranceManager.onUtteranceRequested.connect((npc, utterance)-> {
+			// Show label
+			var mesh:Mesh = npcs.get(npc).mesh;
+			
+			var geometry:Geometry = mesh.geometry;
+			var temp = new Vector3(0, 0, 0);
+			geometry.boundingBox.getCenter(temp);
+			var meshPos:Vector3 = mesh.position;
+			var pos = toScreen(meshPos.x + temp.x, meshPos.y + geometry.boundingBox.max.y, meshPos.z + temp.z);
+			
+			var label = labels.addLabel(LabelId.SPEAKING_CHATTERER, utterance, 0, 0);
+			label.width = 500;
+			label.x = pos.x - label.width / 2;
+			label.y = pos.y;
+		});
+		utteranceManager.onUtteranceProgressed.connect((npc, utterance)-> {
+			var label = labels.mouseLabel;
+			// TODO bob the label up and down?
+			label.y += Std.int(Math.random() * 10);
+		});
+		utteranceManager.onUtteranceEnded.connect((npc, utterance)-> {
+			var label = labels.labels.get(LabelId.SPEAKING_CHATTERER);
+			label.text = "";
+			label.x = -1000;
+			label.y = -1000;
 		});
 	}
 	
@@ -243,8 +203,6 @@ class World {
 			tween.step(dt);
 		}
 		npcMotionTweens = [for (tween in npcMotionTweens) if (tween.isCurrentTimeInBounds()) tween];
-		
-		trace(npcMotionTweens);
 		
 		renderer.render(scene, camera);
 	}
@@ -271,22 +229,6 @@ class World {
 	
 	public function onZombieRemoved(zombie:Zombie):Void {
 		npcGroup.remove(npcs.get(zombie).mesh);
-	}
-	
-	public function addHuman(human:Human) {
-		logicalWorld.addHuman(human);
-	}
-	
-	public function removeHuman(human:Human) {
-		logicalWorld.removeHuman(human);
-	}
-	
-	public function addZombie(zombie:Zombie) {
-		logicalWorld.addZombie(zombie);
-	}
-	
-	public function removeZombie(zombie:Zombie) {
-		logicalWorld.removeZombie(zombie);
 	}
 	
 	private function startNPCMovementAnimation(npc:NPC):Void {

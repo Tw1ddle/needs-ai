@@ -7,20 +7,18 @@ import game.world.World;
 @:access(game.world.World)
 class WorldGenerator {
 	public function new() {
-		
+		// TODO populate a world properly - random human positions, item positions etc
 	}
 	
 	public function create():World {
-		var world = new World("game");
+		var world = new World("game", 50, 50);
 		
 		return world;
 	}
 	
 	public function createHumans():Array<Human> {
-		// TODO populate a world
 		var humans:Array<Human> = [];
 		
-		// TODO spawn many
 		humans.push(new Human(0.5, 2.5));
 		humans.push(new Human(2.5, 2.5));
 		humans.push(new Human(4.5, 2.5));

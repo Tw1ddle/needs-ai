@@ -1,6 +1,6 @@
 package game.ai.ids;
 
-enum ConsiderationId {
+enum NpcConsiderationId {
 	PerceivedZombieThreat;
 	PerceivedHumanStrength;
 }

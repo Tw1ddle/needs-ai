@@ -11,6 +11,7 @@ using StringTools;
 @:enum abstract LabelId(Int) from Int to Int
 {
 	var MOUSEOVER = 0;
+	var SPEAKING_CHATTERER = 1;
 }
 
 class TextLabel
