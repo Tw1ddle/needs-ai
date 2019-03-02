@@ -6,14 +6,22 @@ import game.ai.ids.ChatterBrainId;
 import game.ai.ids.ChatterConsiderationId;
 import game.ai.ids.ChatterReasonerId;
 import game.ai.ids.InputId;
+import game.ai.inputs.RoundStartingInput;
 import game.npcs.humans.Human;
 import game.npcs.zombies.Zombie;
 import game.util.Utterances;
+import game.world.World;
 import needs.ai.Action;
 import needs.ai.ActionSet;
 import needs.ai.Brain;
+import needs.ai.Consideration;
 import needs.ai.Reasoner;
+import needs.inputs.Input;
 import needs.util.Signal.Signal2;
+import needs.responses.Linear;
+import needs.ai.ReasonerActionPickingStrategies;
+import needs.ai.ActionSetScoringStrategies;
+import needs.ai.ReasonerActionPickingStrategies;
 
 class ChatterDirector 
 {
@@ -21,7 +29,7 @@ class ChatterDirector
 	
 	public var onUtteranceChanged(default, null) = new Signal2<ChatterActionId, ChatterActionId>();
 	
-	public function new(humans:Array<Human>, zombies:Array<Zombie>) {
+	public function new(world:World) {
 		// TODO chattering action set enablement consideration e.g. is the NPC around with other humans or alone?
 		
 		// TODO utterance considerations - see that other NPCs have more guns "give me a damn weapon etc"
@@ -29,7 +37,10 @@ class ChatterDirector
 		// - spot a zombie? "shoot them brain dawgs" - tell others where to look if they are nearby
 		// TODO cooldown on all chat items, prevent repetition
 		
-		var roundStartConsiderations = [];
+		var roundStartingInput = new RoundStartingInput(InputId.RoundStartingInput, world);
+		
+		var roundStartConsiderations = [ new Consideration(ChatterConsiderationId.IsRoundStarting, "Round Starting Consideration", roundStartingInput, Linear.make(1, 0)) ];
+		
 		var approvalConsiderations = [];
 		var disapprovalConsiderations = [];
 		var fireConsiderations = [];
@@ -103,14 +114,19 @@ class ChatterDirector
 		];
 		
 		var reasoner = new Reasoner(ChatterReasonerId.UtteranceReasoner, "Utterance Reasoner", actionSets);
+		
+		// Chatterer ranks groups of utterances, then picks a random one in the best group
+		reasoner.selectActionSet = ActionSetScoringStrategies.passthroughScoringStrategy.bind(reasoner);
+		reasoner.selectAction = ReasonerActionPickingStrategies.randomInPreferredActionSet.bind(reasoner);
+		
 		brain = new Brain(ChatterBrainId.Chatterer, [ reasoner ]);
 		
 		brain.onActionChanged.connect((reasoner, before, after)-> {
-			onUtteranceChanged.dispatch(before.id, after.id);
+			onUtteranceChanged.dispatch(before == null ? null : before.id, after == null ? null : after.id);
 		});
 	}
 	
-	public function update(dt:Float):Void {
+	public function think(dt:Float):Void {
 		brain.update();
 	}
 }

@@ -1,5 +1,6 @@
 package game.util;
 
+import game.Positionable;
 import needs.util.HeatMap;
 import game.npcs.NPC;
 
@@ -10,15 +11,15 @@ class PresenceField {
 		m = new HeatMap(width, height);
 	}
 	
-	public function onAdded(o:NPC):Void {
+	public function onAdded(o:Positionable):Void {
 		
 	}
 	
-	public function onRemoved(o:NPC):Void {
+	public function onRemoved(o:Positionable):Void {
 		
 	}
 	
-	public function onMoved(o:NPC):Void {
+	public function onMoved(o:Positionable):Void {
 		
 	}
 }

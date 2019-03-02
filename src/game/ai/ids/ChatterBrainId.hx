@@ -1,6 +1,5 @@
 package game.ai.ids;
 
-enum ChatterBrainId
-{
+enum ChatterBrainId {
 	Chatterer;
 }

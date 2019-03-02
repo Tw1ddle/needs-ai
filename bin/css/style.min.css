@@ -316,3 +316,49 @@ a:hover {
 	position: absolute;
 	text-align: center;
 }
+
+.topaligned {
+	vertical-align: top;
+}
+
+/* Remove default bullets */
+/* Remove margins and padding from the parent ul */
+.npcviewlist {
+	list-style-type: none;
+	margin: 0;
+	padding-left: 5px;
+	text-align: left;
+}
+
+/* Style the caret/arrow */
+.npcviewlistcaret {
+	cursor: pointer; 
+	user-select: none; /* Prevent text selection */
+}
+
+/* Create the caret/arrow with a unicode, and style it */
+.npcviewlistcaret::before {
+	content: "\25B6";
+	color: black;
+	display: inline-block;
+	margin-right: 6px;
+}
+
+/* Rotate the caret/arrow icon when clicked on (using JavaScript) */
+.npcviewlistcaretdown::before {
+	transform: rotate(90deg); 
+}
+
+/* Hide the nested lists */
+.npcviewlistnested {
+	display: none;
+	list-style-type: none;
+	margin: 0;
+	padding-left: 5px;
+	text-align: left;
+}
+
+/* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
+.npcviewlistactive {
+	display: block;
+}

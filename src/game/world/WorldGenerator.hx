@@ -1,7 +1,13 @@
 package game.world;
 
+import game.actualizers.HumanRoamActualizer;
 import game.npcs.humans.Human;
+import game.npcs.zombies.EverydayZombie;
 import game.npcs.zombies.Zombie;
+import game.pickups.health.HealthPickup;
+import game.pickups.health.Pills;
+import game.pickups.weapons.Crowbar;
+import game.pickups.weapons.Weapon;
 import game.world.World;
 
 @:access(game.world.World)
@@ -19,11 +25,11 @@ class WorldGenerator {
 	public function createHumans():Array<Human> {
 		var humans:Array<Human> = [];
 		
-		humans.push(new Human(0.5, 2.5));
-		humans.push(new Human(2.5, 2.5));
-		humans.push(new Human(4.5, 2.5));
-		humans.push(new Human(6.5, 2.5));
-		humans.push(new Human(8.5, 2.5));
+		var x = -18.5;
+		for (i in 0...16) {
+			humans.push(new Human(x, Std.int(Math.random() * 20) + 0.5));
+			x += 2.5;
+		}
 		
 		return humans;
 	}
@@ -31,12 +37,31 @@ class WorldGenerator {
 	public function createZombies():Array<Zombie> {
 		var zombies:Array<Zombie> = [];
 		
-		zombies.push(new Zombie(-0.5, -2.5));
-		zombies.push(new Zombie(-2.5, -2.5));
-		zombies.push(new Zombie(-4.5, -2.5));
-		zombies.push(new Zombie(-6.5, -2.5));
-		zombies.push(new Zombie(-8.5, -2.5));
+		var x = -12.5;
+		for (i in 0...12) {
+			zombies.push(new EverydayZombie(x, Std.int(-Math.random() * 20) - 0.5));
+			x += 2.5;
+		}
 		
 		return zombies;
+	}
+	
+	public function createHealthPickups():Array<HealthPickup> {
+		var healths:Array<HealthPickup> = [];
+		
+		healths.push(new Pills(-4.5, -12.5));
+		healths.push(new Pills(-8.5, 12.5));
+		healths.push(new Pills(-12.5, 12.5));
+		
+		return healths;
+	}
+	
+	public function createWeaponPickups():Array<Weapon> {
+		var weapons:Array<Weapon> = [];
+		
+		weapons.push(new Crowbar(-10, -10));
+		weapons.push(new Crowbar(10, 10));
+		
+		return weapons;
 	}
 }

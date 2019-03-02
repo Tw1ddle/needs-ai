@@ -3,6 +3,9 @@ package game.world;
 import game.npcs.NPC;
 import game.npcs.humans.Human;
 import game.npcs.zombies.Zombie;
+import game.pickups.Pickup;
+import game.pickups.health.HealthPickup;
+import game.pickups.weapons.Weapon;
 import game.util.IntersectionChecker;
 import game.util.TextLabels;
 import game.util.UtteranceManager;
@@ -28,6 +31,7 @@ import macrotween.Ease;
 import macrotween.Tween;
 import needs.util.Signal.Signal1;
 import needs.util.Signal.Signal5;
+import js.three.Object3D;
 
 // Represents the visual representation of an object in the world
 class ShapeMesh {
@@ -46,6 +50,7 @@ class ShapeMesh {
 // Represents the rendering state of the world (logical state is an internal component)
 class World {
 	private var npcIntersectionChecker:IntersectionChecker = null;
+	private var pickupIntersectionChecker:IntersectionChecker = null;
 	private var camera:OrthographicCamera = null;
 	public var container(default, null):DivElement = null;
 	private var renderer:WebGLRenderer = null;
@@ -58,6 +63,9 @@ class World {
 	private var npcs = new ObjectMap<NPC, ShapeMesh>();
 	private var npcGroup = new Group();
 	
+	private var pickups = new ObjectMap<Pickup, ShapeMesh>();
+	private var pickupGroup = new Group();
+	
 	public var onNPCMovementAnimationStarted = new Signal5<NPC, Float, Float, Float, Float>();
 	public var onNPCMovementAnimationEnded = new Signal1<NPC>();
 	
@@ -65,6 +73,7 @@ class World {
 	
 	public function new(containerId:String, widthInCells:Int, heightInCells:Int) {
 		container = cast Browser.window.document.getElementById(containerId);
+		container.innerHTML = "";
 		
 		var containerWidth = container.offsetWidth;
 		var containerHeight = container.offsetHeight;
@@ -114,6 +123,7 @@ class World {
 		scene.add(grid);
 		
 		scene.add(npcGroup);
+		scene.add(pickupGroup);
 		
 		labels = new game.util.TextLabels(container);
 		
@@ -129,15 +139,9 @@ class World {
 			return { x: screenX(vector.x), y: screenY(vector.y) };
 		}
 		
-		npcIntersectionChecker = new IntersectionChecker(camera, npcGroup.children, renderer.domElement);
-		npcIntersectionChecker.onIntersectionChanged.connect((last, current, x, y)-> {
-		});
-		
-		npcIntersectionChecker.onEnter.connect((entered, x, y)-> {
+		var setMouseLabelAboveObject = function(o:Object3D, text:String) {
+			var mesh = cast o;
 			// Put the mouse label at the top of the bounding box of the mesh
-			
-			var npc:NPC = entered.userData;
-			var mesh:Mesh = cast entered;
 			var temp = new Vector3(0, 0, 0);
 			var geometry:Geometry = mesh.geometry;
 			geometry.boundingBox.getCenter(temp);
@@ -145,26 +149,48 @@ class World {
 			var pos = toScreen(meshPos.x + temp.x, meshPos.y + geometry.boundingBox.max.y, meshPos.z + temp.z);
 			
 			var label = labels.mouseLabel;
-			label.text = npc.name;
+			label.text = text;
 			label.width = 500;
 			label.x = pos.x - label.width / 2;
 			label.y = pos.y;
-		});
-		npcIntersectionChecker.onExit.connect((exited, x, y)-> {
-			// Hide the mouse label
-			
+		};
+		
+		var hideMouseLabel = function() {
 			var label = labels.mouseLabel;
 			label.text = "";
 			label.x = -1000;
 			label.y = -1000;
-		});
-		npcIntersectionChecker.onClicked.connect((o, x, y)-> {
-			// Move the NPC (testing...)
-			
-			var npc = o.userData;
-			npc.setPosition(npc.x + 1, npc.y);
+		};
+		
+		npcIntersectionChecker = new IntersectionChecker(camera, npcGroup.children, renderer.domElement);
+		npcIntersectionChecker.onIntersectionChanged.connect((last, current, x, y)-> {
 		});
 		
+		npcIntersectionChecker.onEnter.connect((entered, x, y)-> {
+			setMouseLabelAboveObject(entered, entered.userData.name);
+		});
+		npcIntersectionChecker.onExit.connect((exited, x, y)-> {
+			hideMouseLabel();
+		});
+		//npcIntersectionChecker.onClicked.connect((o, x, y)-> {
+			// Move the NPC (testing...)
+			
+		//	var npc = o.userData;
+		//	npc.setPosition(npc.x + 1, npc.y);
+		//});
+		
+		pickupIntersectionChecker = new IntersectionChecker(camera, pickupGroup.children, renderer.domElement);
+		pickupIntersectionChecker.onIntersectionChanged.connect((last, current, x, y)-> {
+		});
+		
+		pickupIntersectionChecker.onEnter.connect((entered, x, y)-> {
+			setMouseLabelAboveObject(entered, entered.userData.name);
+		});
+		pickupIntersectionChecker.onExit.connect((exited, x, y)-> {
+			hideMouseLabel();
+		});
+		
+		var utteranceBobber:Bool = false;
 		utteranceManager = new UtteranceManager();
 		utteranceManager.onUtteranceRequested.connect((npc, utterance)-> {
 			// Show label
@@ -176,15 +202,18 @@ class World {
 			var meshPos:Vector3 = mesh.position;
 			var pos = toScreen(meshPos.x + temp.x, meshPos.y + geometry.boundingBox.max.y, meshPos.z + temp.z);
 			
-			var label = labels.addLabel(LabelId.SPEAKING_CHATTERER, utterance, 0, 0);
+			var label = labels.getLabel(LabelId.SPEAKING_CHATTERER, 0, 0);
 			label.width = 500;
+			label.text = "";
 			label.x = pos.x - label.width / 2;
 			label.y = pos.y;
 		});
+		
 		utteranceManager.onUtteranceProgressed.connect((npc, utterance)-> {
-			var label = labels.mouseLabel;
-			// TODO bob the label up and down?
-			label.y += Std.int(Math.random() * 10);
+			var label = labels.labels.get(LabelId.SPEAKING_CHATTERER);
+			label.text = utterance;
+			utteranceBobber ? (label.y += 10) : (label.y -= 15);
+			utteranceBobber = !utteranceBobber;
 		});
 		utteranceManager.onUtteranceEnded.connect((npc, utterance)-> {
 			var label = labels.labels.get(LabelId.SPEAKING_CHATTERER);
@@ -194,10 +223,9 @@ class World {
 		});
 	}
 	
-	public function update(dt:Float):Void {
-		logicalWorld.update(dt);
-		
+	public function render(dt:Float):Void {
 		npcIntersectionChecker.checkIntersection();
+		pickupIntersectionChecker.checkIntersection();
 		
 		for (tween in npcMotionTweens) {
 			tween.step(dt);
@@ -231,12 +259,32 @@ class World {
 		npcGroup.remove(npcs.get(zombie).mesh);
 	}
 	
+	public function onHealthAdded(who:NPC, health:HealthPickup):Void {
+		var shape = new ShapeMesh(health, 1.0, 1.0, 1.0, health.x, 0, health.y, 0xAA00AA);
+		pickupGroup.add(shape.mesh);
+		pickups.set(health, shape);
+	}
+	
+	public function onWeaponAdded(who:NPC, weapon:Weapon):Void {
+		var shape = new ShapeMesh(weapon, 1.0, 1.0, 1.0, weapon.x, 0, weapon.y, 0x00AABB);
+		pickupGroup.add(shape.mesh);
+		pickups.set(weapon, shape);
+	}
+	
+	public function onHealthRemoved(who:NPC, health:HealthPickup):Void {
+		pickupGroup.remove(pickups.get(health).mesh);
+	}
+	
+	public function onWeaponRemoved(who:NPC, weapon:Weapon):Void {
+		pickupGroup.remove(pickups.get(weapon).mesh);
+	}
+	
 	private function startNPCMovementAnimation(npc:NPC):Void {
 		var mesh:Mesh = npcs.get(npc).mesh;
 		
 		onNPCMovementAnimationStarted.dispatch(npc, mesh.position.x, mesh.position.z, npc.x, npc.y);
 		
-		npcMotionTweens.push(Tween.tween(0, 1, [ mesh.position.x => npc.x, mesh.position.z => npc.y ], Ease.quadInOut));
+		npcMotionTweens.push(Tween.tween([ mesh.position.x => npc.x, mesh.position.z => npc.y ], 1, 0, Ease.expoInOut));
 		
 		onNPCMovementAnimationEnded.dispatch(npc);
 	}

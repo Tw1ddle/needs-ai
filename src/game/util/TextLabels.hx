@@ -22,10 +22,9 @@ class TextLabel
 	public var width(get, set):Float;
 	public var text(get, set):String;
 	
-	public function new(text:String, x:Int, y:Int) {
+	public function new(x:Int, y:Int) {
 		label = js.Browser.document.createDivElement();
 		label.className = "textlabel";
-		label.innerHTML = text;
 		label.style.zIndex = "1";
 		label.style.left = Std.string(x) + "px";
 		label.style.top = Std.string(y) + "px";
@@ -71,13 +70,13 @@ class TextLabels
 		this.rootElement = rootElement;
 	}
 	
-	public function addLabel(id:LabelId, text:String, x:Int, y:Int):TextLabel {
+	public function getLabel(id:LabelId, x:Int, y:Int):TextLabel {
 		var label = labels.get(id);
 		if(label != null) {
 			return label;
 		}
 		
-		label = new TextLabel(text, x, y);
+		label = new TextLabel(x, y);
 		labels.set(id, label);
 		
 		rootElement.appendChild(label.label);
@@ -93,6 +92,6 @@ class TextLabels
 	}
 	
 	private function get_mouseLabel():TextLabel {
-		return addLabel(LabelId.MOUSEOVER, "", 0, 0);
+		return getLabel(LabelId.MOUSEOVER, 0, 0);
 	}
 }

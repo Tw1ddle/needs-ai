@@ -1,4 +1,4 @@
-package;
+package ui;
 
 import js.d3.D3;
 import js.d3.scale.Scale.Linear;

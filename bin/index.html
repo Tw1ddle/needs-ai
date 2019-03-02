@@ -4,7 +4,7 @@
 		<meta charset="UTF-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width,user-scalable=yes,initial-scale=1,maximum-scale=1">
-		<title>Needs AI - Utility Artificial Intelligence Demo With Utility-Driven Agents</title>
+		<title>Needs AI - Utility Artificial Intelligence Demo Using Utility-Driven Agents</title>
 		<meta name="author" content="Sam Twidale">
 		<meta name="description" content="This utility based artificial intelligence game drives autonomous agents using utility-theory based logic.">
 		<meta name="keywords" content="artificial intelligence, AI, utility, utility theory, needs-based, needs AI, IAUS, utility systems">
@@ -33,14 +33,51 @@
 					<img class="logo" src="https://github.com/Tw1ddle/needs-ai/blob/master/screenshots/logo.png?raw=true" alt="utility-based needs AI icon, artificial intelligence game and library logo">
 				</a>
 				
-				<p><a href="https://github.com/Tw1ddle/needs-ai" target="_blank">Needs AI</a> drives autonomous agents with <a href="https://en.wikipedia.org/wiki/Utility_system" target="_blank">utility based</a> artificial intelligence. An <a href="https://github.com/Tw1ddle/needs-ai" target="_blank">open source</a> demo written by <a href="https://twitter.com/Sam_Twidale" target="_blank">Sam Twidale</a>.</p>
+				<p><a href="https://github.com/Tw1ddle/needs-ai" target="_blank">Needs AI</a> drives autonomous agents using <a href="https://en.wikipedia.org/wiki/Utility_system" target="_blank">utility-based</a> artificial intelligence. An <a href="https://github.com/Tw1ddle/needs-ai" target="_blank">open source</a> minigame by <a href="https://twitter.com/Sam_Twidale" target="_blank">Sam Twidale</a>.</p>
+				
+				<p>Survivors are blue, zombies are red. Click the humans to direct their behaviour. View stats and AI details by selecting NPC names. The console panel at the bottom records events as they happen.</p>
 			</div>
 		</section>
 		
 		<br>
 		
-		<div id="game_wrapper">
-			<span id="game" oncontextmenu="return false;"></span>
+		<div class="container stitched">
+			<div id="game_wrapper">
+				<span id="game" oncontextmenu="return false;">Loading...</span>
+			</div>
+		</div>
+		
+		<div class="container stitched topaligned">
+			<h2>General Actions</h2>
+			
+			<a class="button" id="playturn">
+			    <h2>Play Turn</h2>
+			</a>
+			
+			<br>
+		
+			<a class="button" id="skipturn">
+				<h2>Skip Turn</h2>
+			</a>
+			
+			<br>
+			
+			<a class="button" id="restartgame">
+				<h2>Restart Game</h2>
+			</a>
+			
+		</div>
+			
+		<br>
+		
+		<div class="container stitched topaligned">
+			<h2>Humans</h2>
+			<div id="humanteaminfo">Loading...</div>
+		</div>
+		
+		<div class="container stitched topaligned">
+			<h2>Zombies</h2>
+			<div id="zombieteaminfo">Loading...</div>
 		</div>
 				
 		<br>
@@ -50,29 +87,15 @@
 		<br>
 		
 		<div class="container stitched">
-			<h2 id="agents">Humans</h2>
-			<h2>TODO</h2>
-		</div>
-		
-		<br>
-		
-		<div class="container stitched">
-			<h2 id="agents">Zombies</h2>
-			<h2>TODO</h2>
-		</div>
-		
-		<br>
-		
-		<div class="container stitched">
 			<h2>How It Works</h2>
-			<p>This page uses a <a href="https://en.wikipedia.org/wiki/Utility_system" target="_blank">utility AI</a> to manage humans who "cooperate" against a horde of zombies. It's inspired by <a href="https://en.wikipedia.org/wiki/Zombie_Panic!_Source" target="_blank">Zombie Panic</a> Source.</p>
-			<p>Utility AI, where NPCs consider their own needs, produces agents that exhibit emergent autonomous behaviour and awareness of their environments, without the need for brittle scripting. The approach can be applied in many kinds of game. Implementations tend to be extensible and reusable, and are used in various commercial games, such as The Sims, Iron Man and Red Dead Redemption.</p>
-			<p>This <a href="https://github.com/Tw1ddle/needs-ai" target="_blank">implementation</a> takes the following approach: AI agents have Brains. Brains are top-level decision makers that tell agents what they should try to do. Brains contain Reasoners, these encapsulate logic for assessing the suitability of sets of game actions. Reasoners contain ActionSets, groups of actions. ActionSets consist of Actions, identifiers for actual activities that an agent can engage in the game. Actions (also known as Options) contain Considerations, aspects that an agent must assess to decide whether to perform a game action. Finally, each Consideration (also known as an Axis) references an Input, a measurable aspect of the game world, and a technique for considering (evaluating) the Input.</p>
-			<p>When it is time to update the AI, an agent thinks using their Brain(s). The best scoring actions are chosen through a strategy encapsulated by the Reasoners and ActionSets within the Brains, with individual Actions being scored by evaluating their associated Considerations.</p>
-			<p>A single agent can have more than one Brain. This is for handling separate sets of Actions that may be performed in parallel, like walking and talking. In this demo, humans have one Brain for chattering with fellow survivors and taunting zombies, and another for core behaviours, such as handling weapons or fleeing from zombies.</p>
-			<p>Needs based AI requires careful design and balancing needed to produce the behaviours you want. For example, a human who has to decide whether to flee the undead would have a Consideration based on the number of zombies in the vicinity, but how the Brain processes that information depends on where other survivors are, and how cowardly the survivor in question is.</p>
-			<p>Another area of interest is making Inputs (views of data about your world) available in an efficient way. You often need to provide generalized distances between objects, influence maps, elapsed times and other attributes. Scalability is easy to handle - you can perform triggered updates, make agents only use their Brains every so often, disallow Actions that take a lot of work to consider, or even tell agents to think less when processing power is in short supply.</p>
-			<p>This utility AI demo was written using <a href="https://haxe.org/" target="_blank">Haxe</a>. If you have any suggestions, requests or comments then <a href="https://twitter.com/Sam_Twidale" target="_blank">contact me</a> or open an <a href="https://github.com/Tw1ddle/needs-ai" target="_blank">issue</a>.</p>
+			<p>This page uses a <a href="https://en.wikipedia.org/wiki/Utility_system" target="_blank">utility AI</a> to manage a group of selfish humans who "cooperate" in battles against hordes of zombies. It's inspired by <a href="https://en.wikipedia.org/wiki/Zombie_Panic!_Source" target="_blank">Zombie Panic</a>.</p>
+			<p>Utility AI, where NPCs consider their own needs, produces agents that show an awareness of their environments and act autonomously, without the need for brittle scripting. The approach is tried and tested, and has worked in various commercial games, such as The Sims, Iron Man and Red Dead Redemption.</p>
+			<p>This <a href="https://github.com/Tw1ddle/needs-ai" target="_blank">implementation</a> has the following design: AI agents have Brains. Brains are top-level decision makers that tell agents what they should try to do. Brains contain Reasoners, which encapsulate logic for assessing the suitability of sets of game actions. Reasoners contain ActionSets, groups of actions. ActionSets consist of Actions, identifiers for actual activities an agent can perform in the game. Actions (also known as Options) contain Considerations, aspects that an agent must assess to decide whether to perform a game action. Finally, each Consideration (also known as an Axis) references an Input, a measurable aspect of the game world, and a technique for considering (evaluating) the Input.</p>
+			<p>When it is time to update the AI, an agent thinks using their Brain(s) to evaluate the current situation in the game world. The best scoring actions are chosen using a strategy encapsulated by the Reasoners and ActionSets within the Brains, with individual Actions being evaluated by scoring their associated Considerations. At this point the Actions are merely conceptual, so as the agent's Brains select new actions, a set of Intents are updated based on this. The presence of specific Intents activates or deactivates Actualizers, which are responsible for making the Intents of the agents concrete i.e. actualizing agent intentions.</p>
+			<p>A single agent can have more than one Brain. This is for handling separate sets of Actions that can be performed in parallel, such as walking and talking. In this demo, humans have one Brain for chattering with fellow survivors and taunting zombies, and another for core behaviours, such as handling weapons or fleeing from zombies.</p>
+			<p>Needs based AI requires careful balancing to produce the behaviours you want. For example, a human who has to decide whether to flee the undead has a Consideration based on the number of zombies in the vicinity, but how the Brain processes that information depends on where other survivors are, and how cowardly the survivor in question is.</p>
+			<p>Another area of interest is making Inputs (a view of some information in the world) available in an efficient way. To do this, you often need to provide generalized distances between objects, influence maps, elapsed times and other attributes. Scalability is easy to handle - you can perform triggered updates, make agents only use their Brains every so often, disallow Actions that take a lot of work to consider, or even tell agents to think less often when processing power is in short supply.</p>
+			<p>This utility AI demo was written using <a href="https://haxe.org/" target="_blank">Haxe</a>. For developers, there is a list of articles and useful references in the code repository <a href="https://github.com/Tw1ddle/needs-ai-lib#references" target="_blank">readme</a>. If you have any suggestions, requests or comments then <a href="https://twitter.com/Sam_Twidale" target="_blank">contact me</a> or open an <a href="https://github.com/Tw1ddle/needs-ai" target="_blank">issue</a>.</p>
 		</div>
 		
 		<script type="text/javascript" src="js/jquery.min.js"></script>
