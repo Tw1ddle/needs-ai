@@ -1,6 +1,7 @@
 package game.util;
 
 import game.npcs.NPC;
+import needs.util.Signal.Signal0;
 import needs.util.Signal.Signal2;
 
 class UtteranceManager
@@ -10,6 +11,7 @@ class UtteranceManager
 	public var onUtteranceStarted(default, null) = new Signal2<NPC, String>();
 	public var onUtteranceProgressed(default, null) = new Signal2<NPC, String>();
 	public var onUtteranceEnded(default, null) = new Signal2<NPC, String>();
+	public var onUtteranceCancelled(default, null) = new Signal0();
 	
 	public function new() {
 	}
@@ -38,5 +40,11 @@ class UtteranceManager
 			//trace("UTTERANCE ENDED");
 			onUtteranceEnded.dispatch(speaker, utterance);
 		});
+	}
+	
+	public function cancel():Void {
+		SpeechSynth.cancel();
+		
+		onUtteranceCancelled.dispatch();
 	}
 }

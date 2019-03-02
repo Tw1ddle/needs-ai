@@ -48,6 +48,8 @@ class Main {
 	   Reset the game
 	**/
 	private inline function resetGame():Void {
+		SpeechSynth.cancel(); // Silence anything being read from the last game
+		
 		if (console != null) {
 			console.clear();
 		} else {

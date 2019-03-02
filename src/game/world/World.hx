@@ -44,6 +44,9 @@ class ShapeMesh {
 		mesh.userData = userData;
 	}
 	
+	public dynamic function updateForRendering(dt:Float):Void {
+	}
+	
 	public var mesh:Mesh;
 }
 
@@ -192,7 +195,7 @@ class World {
 		
 		var utteranceBobber:Bool = false;
 		utteranceManager = new UtteranceManager();
-		utteranceManager.onUtteranceRequested.connect((npc, utterance)-> {
+		utteranceManager.onUtteranceRequested.connect((npc, utterance)-> {			
 			// Show label
 			var mesh:Mesh = npcs.get(npc).mesh;
 			
@@ -221,6 +224,12 @@ class World {
 			label.x = -1000;
 			label.y = -1000;
 		});
+		utteranceManager.onUtteranceCancelled.connect(()-> {
+			var label = labels.labels.get(LabelId.SPEAKING_CHATTERER);
+			label.text = "";
+			label.x = -1000;
+			label.y = -1000;
+		});
 	}
 	
 	public function render(dt:Float):Void {
@@ -231,6 +240,13 @@ class World {
 			tween.step(dt);
 		}
 		npcMotionTweens = [for (tween in npcMotionTweens) if (tween.isCurrentTimeInBounds()) tween];
+		
+		for (npc in npcs) {
+			npc.updateForRendering(dt);
+		}
+		for (pickup in pickups) {
+			pickup.updateForRendering(dt);
+		}
 		
 		renderer.render(scene, camera);
 	}
@@ -261,12 +277,18 @@ class World {
 	
 	public function onHealthAdded(who:NPC, health:HealthPickup):Void {
 		var shape = new ShapeMesh(health, 1.0, 1.0, 1.0, health.x, 0, health.y, 0xAA00AA);
+		shape.updateForRendering = function(dt:Float) {
+			shape.mesh.rotation.y += 0.01;
+		};
 		pickupGroup.add(shape.mesh);
 		pickups.set(health, shape);
 	}
 	
 	public function onWeaponAdded(who:NPC, weapon:Weapon):Void {
 		var shape = new ShapeMesh(weapon, 1.0, 1.0, 1.0, weapon.x, 0, weapon.y, 0x00AABB);
+		shape.updateForRendering = function(dt:Float) {
+			shape.mesh.rotation.y += 0.01;
+		};
 		pickupGroup.add(shape.mesh);
 		pickups.set(weapon, shape);
 	}

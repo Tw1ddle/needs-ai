@@ -37,6 +37,14 @@ class SpeechSynth
 		Browser.window.speechSynthesis.speak(utterance);
 	}
 	
+	public static function cancel():Void {
+		if (!supported) {
+			return;
+		}
+		
+		Browser.window.speechSynthesis.cancel();
+	}
+	
 	public static function getVoiceByName(name:String):SpeechSynthesisVoice {
 		if (!supported) {
 			return null;

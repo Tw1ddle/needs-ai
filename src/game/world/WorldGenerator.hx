@@ -7,6 +7,7 @@ import game.npcs.zombies.Zombie;
 import game.pickups.health.HealthPickup;
 import game.pickups.health.Pills;
 import game.pickups.weapons.Crowbar;
+import game.pickups.weapons.Glock17;
 import game.pickups.weapons.Weapon;
 import game.world.World;
 
@@ -48,9 +49,10 @@ class WorldGenerator {
 	public function createHealthPickups():Array<HealthPickup> {
 		var healths:Array<HealthPickup> = [];
 		
-		healths.push(new Pills(-4.5, -12.5));
-		healths.push(new Pills(-8.5, 12.5));
-		healths.push(new Pills(-12.5, 12.5));
+		for (i in 0...10) {
+			var r = randomCell();
+			healths.push(new Pills(r.x, r.y));
+		}
 		
 		return healths;
 	}
@@ -58,9 +60,22 @@ class WorldGenerator {
 	public function createWeaponPickups():Array<Weapon> {
 		var weapons:Array<Weapon> = [];
 		
-		weapons.push(new Crowbar(-10, -10));
-		weapons.push(new Crowbar(10, 10));
+		for (i in 0...5) {
+			var r = randomCell();
+			weapons.push(new Crowbar(r.x, r.y));
+		}
 		
+		for (i in 0...5) {
+			var r = randomCell();
+			weapons.push(new Glock17(r.x, r.y));
+		}
+
 		return weapons;
+	}
+	
+	private function randomCell():{x:Int, y:Int} {
+		var rx = Std.int(Math.random() * 50 - 25);
+		var ry = Std.int(Math.random() * 50 - 25);
+		return {x:rx, y:ry};
 	}
 }
