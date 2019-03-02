@@ -13,7 +13,6 @@ import game.world.World;
 @:access(game.world.World)
 class WorldGenerator {
 	public function new() {
-		// TODO populate a world properly - random human positions, item positions etc
 	}
 	
 	public function create():World {

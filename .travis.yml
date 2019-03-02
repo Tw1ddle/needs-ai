@@ -31,8 +31,6 @@ script:
 
 # Deploy the generated demo using Travis builtin GitHub Pages support
 deploy:
-  edge:
-    branch: v1.8.47
   provider: pages
   skip_cleanup: true
   local_dir: bin
