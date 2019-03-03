@@ -4,7 +4,8 @@ uniform sampler2D heightMap;
 
 varying vec2 vUv;
 
-void main() {
+void main()
+{
     float val = texture2D(heightMap, vUv).x;
     float valU = texture2D(heightMap, vUv + vec2(1.0 / resolution.x, 0.0)).x;
     float valV = texture2D(heightMap, vUv + vec2(0.0, 1.0 / resolution.y)).x;

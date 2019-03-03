@@ -1,5 +1,6 @@
 package ui;
 
+import js.dat.GUI;
 import js.three.Color;
 import js.three.LoadingManager;
 import js.three.Mesh;
@@ -13,7 +14,6 @@ import js.three.Vector2;
 import js.three.WebGLRenderTarget;
 import js.three.WebGLRenderer;
 import needs.util.FileReader;
-import js.dat.GUI;
 
 // Shader that generates a heightmap texture
 class HeightmapShader
@@ -74,7 +74,7 @@ class TerrainShader
 
 class HeightmapView 
 {
-	public var shaderGUI(default, null):GUI = new GUI( { autoPlace:true } );
+	private var shaderGUI(default, null):GUI = new GUI( { autoPlace:true } );
 	
 	private var renderer:WebGLRenderer = null;
 	private var camera:OrthographicCamera = null;
@@ -178,25 +178,30 @@ class HeightmapView
 	public function update(dt:Float) {
 		animDelta = Math.max(Math.min(animDelta + 0.00075 * animDeltaDir, 0), 0.05);
 		
+		// Update height map uniforms
 		heightMapUniforms.time.value += dt * animDelta;
 		heightMapUniforms.offset.value.x += dt * 0.05;
 		
-		terrainUniforms.uNormalScale.value = js.three.Math.mapLinear(0.5, 0, 1, 0.6, 3.5);
-		terrainUniforms.uOffset.value.x = 4 * heightMapUniforms.offset.value.x;
-		
+		// Render height map
 		quadTarget.material = heightMapShaderMaterial;
 		renderer.setRenderTarget(cast heightMap);
 		renderer.clear();
 		renderer.render(scene, camera);
 		
-		normalUniforms.heightMap.value = heightMap.texture;
+		// Update normal shader uniforms
+		normalUniforms.heightMap = heightMap.texture;
 		
+		// Render normal map
 		quadTarget.material = normalShaderMaterial;
 		renderer.setRenderTarget(cast normalMap);
 		renderer.clear();
 		renderer.render(scene, camera);
 		
 		renderer.setRenderTarget(null);
+		
+		// Update terrain shader uniforms
+		terrainUniforms.uNormalScale.value = js.three.Math.mapLinear(0.5, 0, 1, 0.6, 3.5);
+		terrainUniforms.uOffset.value.x = 4 * heightMapUniforms.offset.value.x;
 	}
 	
 	public function addTerrainToScene(targetScene:Scene):Void {

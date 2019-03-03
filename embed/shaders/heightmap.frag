@@ -80,16 +80,16 @@ float snoise(vec3 v)
 float surface3(vec3 coord)
 {
 	float n = 0.0;
-	n += 1.0 * abs( snoise( coord ) );
-	n += 0.5 * abs( snoise( coord * 2.0 ) );
-	n += 0.25 * abs( snoise( coord * 4.0 ) );
-	n += 0.125 * abs( snoise( coord * 8.0 ) );
+	n += 1.0 * abs(snoise(coord));
+	n += 0.5 * abs(snoise(coord * 2.0));
+	n += 0.25 * abs(snoise(coord * 4.0));
+	n += 0.125 * abs(snoise(coord * 8.0));
 	return n;
 }
 
-void main(void)
+void main()
 {
-	vec3 coord = vec3( vUv, -time );
-	float n = surface3( coord );
-	gl_FragColor = vec4( vec3( n, n, n ), 1.0 );
+	vec3 coord = vec3(vUv, -time);
+	float n = surface3(coord);
+	gl_FragColor = vec4(vec3(n, n, n), 1.0);
 }

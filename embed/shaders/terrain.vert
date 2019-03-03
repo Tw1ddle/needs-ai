@@ -13,22 +13,23 @@ varying vec3 vViewPosition;
 attribute vec4 tangent;
 attribute vec3 color;
 
-void main() {
-    vNormal = normalize( normalMatrix * normal );
-    vTangent = normalize( normalMatrix * tangent.xyz );
-    vBinormal = cross( vNormal, vTangent ) * tangent.w;
-    vBinormal = normalize( vBinormal );
+void main()
+{
+    vNormal = normalize(normalMatrix * normal);
+    vTangent = normalize(normalMatrix * tangent.xyz);
+    vBinormal = cross(vNormal, vTangent) * tangent.w;
+    vBinormal = normalize(vBinormal);
     vUv = uv;
     vec2 uvBase = uv * uRepeatBase;
 
-	vec3 dv = texture2D( tDisplacement, uvBase ).xyz;
+	vec3 dv = texture2D(tDisplacement, uvBase).xyz;
 	float df = uDisplacementScale * dv.x + uDisplacementBias;
 	vec3 displacedPosition = normal * df + position;
-	vec4 worldPosition = modelMatrix * vec4( displacedPosition, 1.0 );
-	vec4 mvPosition = modelViewMatrix * vec4( displacedPosition, 1.0 );
+	vec4 worldPosition = modelMatrix * vec4(displacedPosition, 1.0);
+	vec4 mvPosition = modelViewMatrix * vec4(displacedPosition, 1.0);
 	
     gl_Position = projectionMatrix * mvPosition;
     vViewPosition = -mvPosition.xyz;
-    vec3 normalTex = texture2D( tNormal, uvBase ).xyz * 2.0 - 1.0;
+    vec3 normalTex = texture2D(tNormal, uvBase).xyz * 2.0 - 1.0;
     vNormal = normalMatrix * normalTex;
 }
