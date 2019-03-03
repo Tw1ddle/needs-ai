@@ -1,11 +1,9 @@
-uniform vec3 diffuse;
-uniform float opacity;
-uniform bool enableDiffuse1;
-uniform bool enableDiffuse2;
 uniform sampler2D tDiffuse1;
 uniform sampler2D tDiffuse2;
 uniform sampler2D tDetail;
 uniform sampler2D tDisplacement;
+uniform vec3 diffuse;
+uniform float opacity;
 uniform float uNormalScale;
 uniform vec2 uRepeatOverlay;
 uniform vec2 uRepeatBase;
@@ -24,19 +22,13 @@ void main()
     vec2 uvBase = uRepeatBase * vUv;
     vec3 normalTex = texture2D(tDetail, uvOverlay).xyz * 2.0 - 1.0;
     normalTex.xy *= uNormalScale;
-    normalTex = normalize(normalTex);
+	normalTex = normalize(normalTex);
 
-    if(enableDiffuse1 && enableDiffuse2) {
-        vec4 colDiffuse1 = texture2D(tDiffuse1, uvOverlay);
-        vec4 colDiffuse2 = texture2D(tDiffuse2, uvOverlay);
-        colDiffuse1 = GammaToLinear(colDiffuse1, float(GAMMA_FACTOR));
-        colDiffuse2 = GammaToLinear(colDiffuse2, float(GAMMA_FACTOR));
-        diffuseColor *= mix(colDiffuse1, colDiffuse2, 1.0 - texture2D(tDisplacement, uvBase));
-    } else if(enableDiffuse1) {
-        diffuseColor *= texture2D(tDiffuse1, uvOverlay);
-    } else if(enableDiffuse2) {
-        diffuseColor *= texture2D(tDiffuse2, uvOverlay);
-    }
+	vec4 colDiffuse1 = texture2D(tDiffuse1, uvOverlay);
+	vec4 colDiffuse2 = texture2D(tDiffuse2, uvOverlay);
+	colDiffuse1 = GammaToLinear(colDiffuse1, float(GAMMA_FACTOR));
+	colDiffuse2 = GammaToLinear(colDiffuse2, float(GAMMA_FACTOR));
+	diffuseColor *= mix(colDiffuse1, colDiffuse2, 1.0 - texture2D(tDisplacement, uvBase));
 
     mat3 tsb = mat3(vTangent, vBinormal, vNormal);
     vec3 finalNormal = tsb * normalTex;

@@ -91,5 +91,6 @@ void main()
 {
 	vec3 coord = vec3(vUv, -time);
 	float n = surface3(coord);
+	
 	gl_FragColor = vec4(vec3(n, n, n), 1.0);
 }

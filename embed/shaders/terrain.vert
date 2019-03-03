@@ -1,6 +1,6 @@
-uniform vec2 uRepeatBase;
 uniform sampler2D tNormal;
 uniform sampler2D tDisplacement;
+uniform vec2 uRepeatBase;
 uniform float uDisplacementScale;
 uniform float uDisplacementBias;
 

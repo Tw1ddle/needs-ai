@@ -254,7 +254,10 @@ class World {
 			pickup.updateForRendering(dt);
 		}
 		
-		heightmapView.update(dt);
+		if(heightmapView.dirty) {
+			heightmapView.render(dt);
+			heightmapView.dirty = false;
+		}
 		
 		renderer.render(scene, camera);
 	}

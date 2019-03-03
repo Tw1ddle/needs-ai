@@ -59,8 +59,6 @@ class TerrainShader
 			"tDiffuse1": { value: null },
 			"tDiffuse2": { value: null },
 			"tDetail": { value: null },
-			"enableDiffuse1": { value: true },
-			"enableDiffuse2": { value: true },
 			"diffuse": { value: new Color(0xffffff) },
 			"opacity": { value: 1 },
 			"uDisplacementBias": { value: 0.0 },
@@ -97,6 +95,8 @@ class HeightmapView
 	private var heightMapShaderMaterial:ShaderMaterial = null;
 	private var normalShaderMaterial:ShaderMaterial = null;
 	private var terrainShaderMaterial:ShaderMaterial = null;
+	
+	public var dirty:Bool = true;
 	
 	public function new(renderer:WebGLRenderer) {
 		this.renderer = renderer;
@@ -149,8 +149,6 @@ class HeightmapView
 		terrainUniforms.tDiffuse1.value = diffuseTexture1;
 		terrainUniforms.tDiffuse2.value = diffuseTexture2;
 		terrainUniforms.tDetail.value = detailTexture;
-		terrainUniforms.enableDiffuse1.value = true;
-		terrainUniforms.enableDiffuse2.value = true;
 		terrainUniforms.diffuse.value.setHex(0xffffff);
 		terrainUniforms.uDisplacementScale.value = 375;
 		terrainUniforms.uRepeatOverlay.value.set(6, 6);
@@ -175,17 +173,16 @@ class HeightmapView
 		terrain.visible = false;
 	}
 	
-	public function update(dt:Float) {
-		animDelta = Math.max(Math.min(animDelta + 0.00075 * animDeltaDir, 0), 0.05);
+	public function render(dt:Float) {
+		//animDelta = Math.max(Math.min(animDelta + 0.00075 * animDeltaDir, 0), 0.05);
 		
 		// Update height map uniforms
-		heightMapUniforms.time.value += dt * animDelta;
-		heightMapUniforms.offset.value.x += dt * 0.05;
+		//heightMapUniforms.time.value += dt * animDelta;
+		//heightMapUniforms.offset.value.x += dt * 0.05;
 		
 		// Render height map
 		quadTarget.material = heightMapShaderMaterial;
 		renderer.setRenderTarget(cast heightMap);
-		renderer.clear();
 		renderer.render(scene, camera);
 		
 		// Update normal shader uniforms
@@ -194,7 +191,6 @@ class HeightmapView
 		// Render normal map
 		quadTarget.material = normalShaderMaterial;
 		renderer.setRenderTarget(cast normalMap);
-		renderer.clear();
 		renderer.render(scene, camera);
 		
 		renderer.setRenderTarget(null);
