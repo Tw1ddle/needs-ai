@@ -21,6 +21,7 @@ import js.three.GridHelper;
 import js.three.Group;
 import js.three.Mesh;
 import js.three.MeshPhongMaterial;
+import js.three.Object3D;
 import js.three.OrbitControls;
 import js.three.OrthographicCamera;
 import js.three.PointLight;
@@ -31,7 +32,7 @@ import macrotween.Ease;
 import macrotween.Tween;
 import needs.util.Signal.Signal1;
 import needs.util.Signal.Signal5;
-import js.three.Object3D;
+import ui.HeightmapView;
 
 // Represents the visual representation of an object in the world
 class ShapeMesh {
@@ -58,6 +59,7 @@ class World {
 	public var container(default, null):DivElement = null;
 	private var renderer:WebGLRenderer = null;
 	private var scene:Scene = null;
+	private var heightmapView:HeightmapView = null;
 	private var labels:TextLabels = null;
 	public var utteranceManager(default, null):UtteranceManager = null;
 	
@@ -87,6 +89,7 @@ class World {
 		
 		renderer = new WebGLRenderer({canvas:canvas, antialias:true});
 		renderer.sortObjects = true;
+		renderer.setPixelRatio(Browser.window.devicePixelRatio);
 		renderer.setSize(containerWidth, containerHeight);
 		
 		container.appendChild(renderer.domElement);
@@ -230,6 +233,9 @@ class World {
 			label.x = -1000;
 			label.y = -1000;
 		});
+		
+		heightmapView = new HeightmapView(renderer);
+		heightmapView.addTerrainToScene(scene);
 	}
 	
 	public function render(dt:Float):Void {
@@ -247,6 +253,8 @@ class World {
 		for (pickup in pickups) {
 			pickup.updateForRendering(dt);
 		}
+		
+		heightmapView.update(dt);
 		
 		renderer.render(scene, camera);
 	}
