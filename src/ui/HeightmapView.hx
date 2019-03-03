@@ -13,7 +13,9 @@ import js.three.Vector2;
 import js.three.WebGLRenderTarget;
 import js.three.WebGLRenderer;
 import needs.util.FileReader;
+import js.dat.GUI;
 
+// Shader that generates a heightmap texture
 class HeightmapShader
 {	
 	public static var vertex(default, null):String = FileReader.readFileAsString("../embed/shaders/heightmap.vert");
@@ -28,6 +30,7 @@ class HeightmapShader
 	}
 }
 
+// Shader that generates a normalmap texture from a heightmap texture
 class NormalShader
 {
 	public static var vertex(default, null):String = FileReader.readFileAsString("../embed/shaders/normal.vert");
@@ -42,6 +45,7 @@ class NormalShader
 	}
 }
 
+// Shader that renders textured, lit terrain from a normalmap texture
 class TerrainShader
 {
 	public static var vertex(default, null):String = FileReader.readFileAsString("../embed/shaders/terrain.vert");
@@ -54,15 +58,10 @@ class TerrainShader
 			"tDisplacement": { value: null },
 			"tDiffuse1": { value: null },
 			"tDiffuse2": { value: null },
-			"tSpecular": { value: null },
 			"tDetail": { value: null },
 			"enableDiffuse1": { value: true },
 			"enableDiffuse2": { value: true },
-			"enableSpecular": { value: true },
-			"enableReflection": { value: false },
 			"diffuse": { value: new Color(0xffffff) },
-			"specular": { value: new Color(0xffffff) },
-			"shininess": { value: 30 },
 			"opacity": { value: 1 },
 			"uDisplacementBias": { value: 0.0 },
 			"uDisplacementScale": { value: 375 },
@@ -74,7 +73,9 @@ class TerrainShader
 }
 
 class HeightmapView 
-{	
+{
+	public var shaderGUI(default, null):GUI = new GUI( { autoPlace:true } );
+	
 	private var renderer:WebGLRenderer = null;
 	private var camera:OrthographicCamera = null;
 	private var scene:Scene = null;
@@ -116,8 +117,10 @@ class HeightmapView
 		var linearFilter = 1006;
 		var rgbFormat = 1022;
 		var pars = { minFilter: linearFilter, magFilter: linearFilter, format: rgbFormat };
+		
 		heightMap = new WebGLRenderTarget(rx, ry, cast pars);
 		heightMap.texture.generateMipmaps = false;
+		
 		normalMap = new WebGLRenderTarget(rx, ry, cast pars);
 		normalMap.texture.generateMipmaps = false;
 
@@ -130,8 +133,6 @@ class HeightmapView
 			terrain.visible = true;
 		});
 		var textureLoader = new TextureLoader(loadingManager);
-		var specularMap = new WebGLRenderTarget(2048, 2048, cast pars);
-		specularMap.texture.generateMipmaps = false;
 		var diffuseTexture1 = textureLoader.load("assets/images/grasslight-big.jpg");
 		var diffuseTexture2 = textureLoader.load("assets/images/backgrounddetailed6.jpg");
 		var detailTexture = textureLoader.load("assets/images/grasslight-big-nm.jpg");
@@ -140,22 +141,17 @@ class HeightmapView
 		diffuseTexture1.wrapS = diffuseTexture1.wrapT = repeatWrapping;
 		diffuseTexture2.wrapS = diffuseTexture2.wrapT = repeatWrapping;
 		detailTexture.wrapS = detailTexture.wrapT = repeatWrapping;
-		specularMap.texture.wrapS = specularMap.texture.wrapT = repeatWrapping;
-		
+
 		// Terrain shader
 		terrainUniforms.tNormal.value = normalMap.texture;
 		terrainUniforms.uNormalScale.value = 3.5;
 		terrainUniforms.tDisplacement.value = heightMap.texture;
 		terrainUniforms.tDiffuse1.value = diffuseTexture1;
 		terrainUniforms.tDiffuse2.value = diffuseTexture2;
-		terrainUniforms.tSpecular.value = specularMap.texture;
 		terrainUniforms.tDetail.value = detailTexture;
 		terrainUniforms.enableDiffuse1.value = true;
 		terrainUniforms.enableDiffuse2.value = true;
-		terrainUniforms.enableSpecular.value = true;
 		terrainUniforms.diffuse.value.setHex(0xffffff);
-		terrainUniforms.specular.value.setHex(0xffffff);
-		terrainUniforms.shininess.value = 30;
 		terrainUniforms.uDisplacementScale.value = 375;
 		terrainUniforms.uRepeatOverlay.value.set(6, 6);
 		
@@ -193,6 +189,8 @@ class HeightmapView
 		renderer.clear();
 		renderer.render(scene, camera);
 		
+		normalUniforms.heightMap.value = heightMap.texture;
+		
 		quadTarget.material = normalShaderMaterial;
 		renderer.setRenderTarget(cast normalMap);
 		renderer.clear();
@@ -202,6 +200,6 @@ class HeightmapView
 	}
 	
 	public function addTerrainToScene(targetScene:Scene):Void {
-		//targetScene.add(terrain);
+		targetScene.add(terrain);
 	}
 }
