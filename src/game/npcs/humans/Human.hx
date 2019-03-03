@@ -1,7 +1,7 @@
 package game.npcs.humans;
 
 import game.actualizers.ActualizerParams;
-import game.actualizers.HumanRoamActualizer;
+import game.actualizers.HumanAttackActualizer;
 import game.ai.ids.InputId;
 import game.ai.ids.NpcActionId;
 import game.ai.ids.NpcActionSetId;
@@ -11,10 +11,8 @@ import game.ai.ids.NpcReasonerId;
 import game.ai.inputs.PerceivedThreatInput;
 import game.ai.inputs.SuppliesHeldInput;
 import game.ai.inputs.SuppliesPresenceInput;
-import game.intent.HumanActionIntent;
 import game.npcs.NPC;
 import haxe.ds.StringMap;
-import haxe.io.Input;
 import needs.ai.Action;
 import needs.ai.ActionSet;
 import needs.ai.Brain;
@@ -22,14 +20,15 @@ import needs.ai.Consideration;
 import needs.ai.Reasoner;
 import needs.responses.Linear;
 import needs.util.Signal.Signal2;
+import game.actualizers.SharedActualizers;
 
 class Human extends NPC {
 	public var onActionChanged(default, null) = new Signal2<Action<NpcActionId, NpcConsiderationId, InputId>, Action<NpcActionId, NpcConsiderationId, InputId>>();
 	
-	public var intents(default, null):Array<HumanActionIntent> = [];
-	
 	public function new(x:Float = 0, y:Float = 0) {
 		super(x, y);
+		
+		actualizerCtx.set(ActualizerParams.SUBJECT_ACTOR, this);
 		
 		var zombieThreatInput = new PerceivedThreatInput(InputId.PerceivedZombieThreatInput, this, Main.world);
 		var humanStrengthInput = new PerceivedThreatInput(InputId.PerceivedHumanStrengthInput, this, Main.world);
@@ -59,6 +58,35 @@ class Human extends NPC {
 			onActionChanged.dispatch(fromAction, toAction);
 		});
 		
+		onActionChanged.connect((from, to)-> {
+			if (from != null) {
+				switch(from.id) {
+					case NpcActionId.Attack:
+						removeActualizer(SharedActualizers.humanAttackActualizer);
+					case NpcActionId.GatherSupplies:
+						removeActualizer(SharedActualizers.humanGatherSuppliesActualizer);
+					case NpcActionId.Panic:
+						removeActualizer(SharedActualizers.humanPanicActualizer);
+					case NpcActionId.Retreat:
+						removeActualizer(SharedActualizers.humanRetreatActualizer);
+					case _:
+				}
+			}
+			if (to != null) {
+				switch(to.id) {
+					case NpcActionId.Attack:
+						addActualizer(SharedActualizers.humanAttackActualizer);
+					case NpcActionId.GatherSupplies:
+						addActualizer(SharedActualizers.humanGatherSuppliesActualizer);
+					case NpcActionId.Panic:
+						addActualizer(SharedActualizers.humanPanicActualizer);
+					case NpcActionId.Retreat:
+						addActualizer(SharedActualizers.humanRetreatActualizer);
+					case _:
+				}
+			}
+		});
+		
 		addBrain(humanBrain);
 	}
 	
@@ -67,6 +95,6 @@ class Human extends NPC {
 	}
 	
 	override private function makeActualizerContext():StringMap<Dynamic> {
-		return [ ActualizerParams.SUBJECT_ACTOR => this ];
+		return actualizerCtx;
 	}
 }

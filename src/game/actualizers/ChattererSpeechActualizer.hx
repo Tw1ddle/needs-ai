@@ -4,8 +4,8 @@ import haxe.ds.StringMap;
 import game.world.World;
 
 class ChattererSpeechActualizer extends Actualizer {
-	public function new(world:World) {
-		super(world, ActualizerId.ChattererSpeech);
+	public function new() {
+		super(ActualizerId.ChattererSpeech);
 	}
 	
 	override public function actualize(?params:StringMap<Dynamic>):Void {

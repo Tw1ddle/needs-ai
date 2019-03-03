@@ -277,8 +277,9 @@ class World {
 	
 	public function onHealthAdded(who:NPC, health:HealthPickup):Void {
 		var shape = new ShapeMesh(health, 1.0, 1.0, 1.0, health.x, 0, health.y, 0xAA00AA);
+		shape.mesh.rotation.y = Math.random() * Math.PI;
 		shape.updateForRendering = function(dt:Float) {
-			shape.mesh.rotation.y += 0.01;
+			shape.mesh.rotation.y += dt;
 		};
 		pickupGroup.add(shape.mesh);
 		pickups.set(health, shape);
@@ -286,8 +287,9 @@ class World {
 	
 	public function onWeaponAdded(who:NPC, weapon:Weapon):Void {
 		var shape = new ShapeMesh(weapon, 1.0, 1.0, 1.0, weapon.x, 0, weapon.y, 0x00AABB);
+		shape.mesh.rotation.y = Math.random() * Math.PI;
 		shape.updateForRendering = function(dt:Float) {
-			shape.mesh.rotation.y += 0.01;
+			shape.mesh.rotation.y += dt;
 		};
 		pickupGroup.add(shape.mesh);
 		pickups.set(weapon, shape);

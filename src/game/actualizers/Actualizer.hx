@@ -5,10 +5,9 @@ import haxe.ds.StringMap;
 
 class Actualizer {
 	public var id(default, null):ActualizerId;
-	private var world:World;
+	public var world(get, null):World;
 	
-	public function new(world:World, id:ActualizerId) {
-		this.world = world;
+	public function new(id:ActualizerId) {
 		this.id = id;
 	}
 	
@@ -16,11 +15,7 @@ class Actualizer {
 		
 	}
 	
-	public function onSuccess(?params:StringMap<Dynamic>):Void {
-		
-	}
-	
-	public function onFailure(?params:StringMap<Dynamic>):Void {
-		
+	private function get_world():World {
+		return Main.world;
 	}
 }

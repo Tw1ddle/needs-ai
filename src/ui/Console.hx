@@ -47,10 +47,10 @@ class Console
 			echo(who.name + " acted on desires for " +  stringifyActualizers(who.fallbackActualizers) + ", as they could not think of what else to do.");
 		});
 		world.logicalWorld.onHumanActed.connect((who)-> {
-			echo(who.name + " acted on desires for " + stringifyActualizers(who.actualizers) + " with intents [ " + who.intents + "].");
+			echo(who.name + " acted on desires for " + stringifyActualizers(who.actualizers));
 		});
 		world.logicalWorld.onZombieActed.connect((who)-> {
-			echo(who.name + " acted on desires for " + stringifyActualizers(who.actualizers) + " with intents [ " + who.intents + "].");
+			echo(who.name + " acted on desires for " + stringifyActualizers(who.actualizers));
 		});
 		
 		world.utteranceManager.onUtteranceRequested.connect((npc, what)-> {

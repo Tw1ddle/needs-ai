@@ -67,12 +67,12 @@ class Main {
 		
 		var humans = generator.createHumans();
 		for (human in humans) {
-			human.addFallbackActualizer(new HumanRoamActualizer(world));
+			human.addFallbackActualizer(new HumanRoamActualizer());
 		}
 		
 		var zombies = generator.createZombies();
 		for (zombie in zombies) {
-			zombie.addFallbackActualizer(new ZombieRoamActualizer(world));
+			zombie.addFallbackActualizer(new ZombieRoamActualizer());
 		}
 		
 		var healths = generator.createHealthPickups();
