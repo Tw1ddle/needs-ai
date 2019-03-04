@@ -127,7 +127,7 @@ class World {
 		
 		// Heightmap visualization
 		heightmapView = new HeightmapView(renderer);
-		var geometryTerrain = new PlaneBufferGeometry(gridSize, gridSize, gridSize * 2, gridSize * 2);
+		var geometryTerrain = new PlaneBufferGeometry(gridSize * 2, gridSize * 2, gridSize * 3, gridSize * 3);
 		untyped THREE.BufferGeometryUtils.computeTangents(geometryTerrain);
 		var terrain = new Mesh(cast geometryTerrain, heightmapView.terrainShaderMaterial);
 		terrain.rotation.x = -Math.PI / 2;

@@ -53,7 +53,7 @@ class HeightmapShader
 	public static function makeUniforms():HeightmapShaderUniforms {
 		return {
 			time: { type: "f", value: 1.0 },
-			scale: { type: "v2", value: new Vector2(0.5, 0.5) },
+			scale: { type: "v2", value: new Vector2(1.875, 1.875) },
 			offset: { type: "v2", value: new Vector2(0, 0) }
 		};
 	}
