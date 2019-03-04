@@ -15,7 +15,6 @@ import js.html.DivElement;
 import js.three.AmbientLight;
 import js.three.BoxGeometry;
 import js.three.Color;
-import js.three.FogExp2;
 import js.three.Geometry;
 import js.three.GridHelper;
 import js.three.Group;
@@ -24,6 +23,7 @@ import js.three.MeshPhongMaterial;
 import js.three.Object3D;
 import js.three.OrbitControls;
 import js.three.OrthographicCamera;
+import js.three.PlaneBufferGeometry;
 import js.three.PointLight;
 import js.three.Scene;
 import js.three.Vector3;
@@ -96,8 +96,7 @@ class World {
 		
 		scene = new Scene();
 		scene.background = new Color(0xCCCCCC);
-		scene.fog = new FogExp2(0xCCCCCC, 0.0073);
-		
+
 		scene.add(new AmbientLight(0x4000ff));
 		
 		var pointLight = new PointLight(0xFFFFFF, 6, 40);
@@ -120,13 +119,21 @@ class World {
 		untyped controls.zoomSpeed = 5;
 		controls.enableKeys = false;
 		
-		// TODO camera key controls
-		
 		logicalWorld = new LogicalWorld(this, widthInCells, heightInCells);
 		
 		var gridSize = Std.int(Math.max(logicalWorld.width, logicalWorld.height));
 		var grid = new GridHelper(gridSize, gridSize); // Note the grid is square-shaped
-		scene.add(grid);
+		//scene.add(grid);
+		
+		// Heightmap visualization
+		heightmapView = new HeightmapView(renderer);
+		var geometryTerrain = new PlaneBufferGeometry(gridSize, gridSize, gridSize * 2, gridSize * 2);
+		untyped THREE.BufferGeometryUtils.computeTangents(geometryTerrain);
+		var terrain = new Mesh(cast geometryTerrain, heightmapView.terrainShaderMaterial);
+		terrain.rotation.x = -Math.PI / 2;
+		terrain.position.y = -5;
+		
+		scene.add(terrain);
 		
 		scene.add(npcGroup);
 		scene.add(pickupGroup);
@@ -233,9 +240,6 @@ class World {
 			label.x = -1000;
 			label.y = -1000;
 		});
-		
-		heightmapView = new HeightmapView(renderer);
-		heightmapView.addTerrainToScene(scene);
 	}
 	
 	public function render(dt:Float):Void {
@@ -254,10 +258,7 @@ class World {
 			pickup.updateForRendering(dt);
 		}
 		
-		if(heightmapView.dirty) {
-			heightmapView.render(dt);
-			heightmapView.dirty = false;
-		}
+		heightmapView.render(dt);
 		
 		renderer.render(scene, camera);
 	}
