@@ -34,6 +34,8 @@ void main()
     vec3 finalNormal = tsb * normalTex;
     vec3 normal = normalize(finalNormal);
     vec3 viewPosition = normalize(vViewPosition);
+	
+	// TODO re-add lighting/normal usage
 
     gl_FragColor = diffuseColor;
 }

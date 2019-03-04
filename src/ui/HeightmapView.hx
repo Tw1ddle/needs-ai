@@ -108,38 +108,51 @@ class HeightmapView
 			
 		};
 		
-		//shaderGUI.add(controller, "preset", ["stellarDawn", "redSunset", "bloodSky", "alienDay", "blueDusk", "purpleDusk"]).listen().onChange(onPresetChanged);
+		var add = function(parent:GUI, object:Dynamic, fieldName:String, folderName:String, step:Float = 0.025) {
+			var folder = parent.addFolder(folderName);
+			return folder.add(object, fieldName).step(step).listen().onChange(updateValues);
+		}
 		
 		var heightmapFolder = shaderGUI.addFolder("Height Map");
-		heightmapFolder.add(heightMapUniforms.time, "value").step(0.025).listen().onChange(updateValues);
+		add(heightmapFolder, heightMapUniforms.time, "value", "time").step(0.025).listen().onChange(updateValues);
+		
 		var heightmapScaleFolder = heightmapFolder.addFolder("scale");
 		heightmapScaleFolder.add(heightMapUniforms.scale.value, "x").step(0.025).listen().onChange(updateValues);
 		heightmapScaleFolder.add(heightMapUniforms.scale.value, "y").step(0.025).listen().onChange(updateValues);
+		
 		var heightmapOffsetFolder = heightmapFolder.addFolder("offset");
 		heightmapOffsetFolder.add(heightMapUniforms.offset.value, "x").step(0.025).listen().onChange(updateValues);
 		heightmapOffsetFolder.add(heightMapUniforms.offset.value, "y").step(0.025).listen().onChange(updateValues);
 		
+		
 		var normalmapFolder = shaderGUI.addFolder("Normal Map");
-		normalmapFolder.add(normalUniforms.height, "value").step(0.025).listen().onChange(updateValues);
+		add(normalmapFolder, normalUniforms.height, "value", "height").step(0.025).listen().onChange(updateValues);
+		
 		var normalmapResolutionFolder = normalmapFolder.addFolder("resolution");
 		normalmapResolutionFolder.add(normalUniforms.resolution.value, "x").step(0.025).listen().onChange(updateValues);
 		normalmapResolutionFolder.add(normalUniforms.resolution.value, "y").step(0.025).listen().onChange(updateValues);
 		
+		
 		var terrainFolder = shaderGUI.addFolder("Terrain");
-		terrainFolder.add(terrainUniforms.uNormalScale, "value").step(0.025).listen().onChange(updateValues);
+		add(terrainFolder, terrainUniforms.uNormalScale, "value", "normal scale").step(0.025).listen().onChange(updateValues);
+		
 		var diffuseColorFolder = terrainFolder.addFolder("diffuse");
 		diffuseColorFolder.add(terrainUniforms.diffuse.value, "r").step(0.025).listen().onChange(updateValues);
 		diffuseColorFolder.add(terrainUniforms.diffuse.value, "g").step(0.025).listen().onChange(updateValues);
 		diffuseColorFolder.add(terrainUniforms.diffuse.value, "b").step(0.025).listen().onChange(updateValues);
-		terrainFolder.add(terrainUniforms.opacity, "value").step(0.025).listen().onChange(updateValues);
-		terrainFolder.add(terrainUniforms.uDisplacementBias, "value").step(0.25).listen().onChange(updateValues);
-		terrainFolder.add(terrainUniforms.uDisplacementScale, "value").step(0.25).listen().onChange(updateValues);
+		
+		add(terrainFolder, terrainUniforms.opacity, "value", "opacity").step(0.025).listen().onChange(updateValues);
+		add(terrainFolder, terrainUniforms.uDisplacementBias, "value", "displacement bias").step(0.25).listen().onChange(updateValues);
+		add(terrainFolder, terrainUniforms.uDisplacementScale, "value", "displacement scale").step(0.25).listen().onChange(updateValues);
+		
 		var repeatBaseFolder = terrainFolder.addFolder("repeatBase");
 		repeatBaseFolder.add(terrainUniforms.uRepeatBase.value, "x").step(0.025).listen().onChange(updateValues);
 		repeatBaseFolder.add(terrainUniforms.uRepeatBase.value, "y").step(0.025).listen().onChange(updateValues);
+		
 		var repeatOverlayFolder = terrainFolder.addFolder("repeatOverlay");
 		repeatOverlayFolder.add(terrainUniforms.uRepeatOverlay.value, "x").step(0.025).listen().onChange(updateValues);
 		repeatOverlayFolder.add(terrainUniforms.uRepeatOverlay.value, "y").step(0.025).listen().onChange(updateValues);
+		
 		var offsetFolder = terrainFolder.addFolder("offset");
 		offsetFolder.add(terrainUniforms.uOffset.value, "x").step(0.025).listen().onChange(updateValues);
 	    offsetFolder.add(terrainUniforms.uOffset.value, "y").step(0.025).listen().onChange(updateValues);
