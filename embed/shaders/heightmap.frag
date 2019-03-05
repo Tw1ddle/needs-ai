@@ -6,8 +6,13 @@
 //     License : Copyright (C) 2011 Ashima Arts. All rights reserved.
 //               Distributed under the MIT License. See LICENSE file.
 //
+
+uniform sampler2D heightMap;
 uniform float time;
-varying vec2 vUv;
+uniform float noiseContribution;
+
+varying vec2 vUvNoise;
+varying vec2 vUvTexture;
 
 vec4 permute(vec4 x)
 {
@@ -89,8 +94,10 @@ float surface3(vec3 coord)
 
 void main()
 {
-	vec3 coord = vec3(vUv, -time);
+	vec4 hVal = texture2D(heightMap, vUvTexture);
+
+	vec3 coord = vec3(vUvNoise, -time);
 	float n = surface3(coord);
 	
-	gl_FragColor = vec4(vec3(n, n, n), 1.0);
+	gl_FragColor = mix(hVal, vec4(vec3(n, n, n), 1.0), noiseContribution);
 }

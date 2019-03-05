@@ -1,7 +1,9 @@
 package ui;
 
 import js.dat.GUI;
+import js.html.Uint8Array;
 import js.three.Color;
+import js.three.DataTexture;
 import js.three.LoadingManager;
 import js.three.Mesh;
 import js.three.MeshBasicMaterial;
@@ -17,9 +19,11 @@ import js.three.WebGLRenderer;
 import needs.util.FileReader;
 
 typedef HeightmapShaderUniforms = {
-	time: { type: String, value:Float },
-	scale: { type: String, value:Vector2 },
-	offset: { type: String, value:Vector2 }
+	heightMap: { type:String, value:Texture },
+	time: { type:String, value:Float },
+	noiseContribution: { type:String, value:Float},
+	scale: { type:String, value:Vector2 },
+	offset: { type:String, value:Vector2 }
 };
 
 typedef NormalShaderUniforms = {
@@ -52,7 +56,9 @@ class HeightmapShader
 	
 	public static function makeUniforms():HeightmapShaderUniforms {
 		return {
+			heightMap: { type: "t", value: null },
 			time: { type: "f", value: 1.0 },
+			noiseContribution: { type: "f", value: 0.5 },
 			scale: { type: "v2", value: new Vector2(1.875, 1.875) },
 			offset: { type: "v2", value: new Vector2(0, 0) }
 		};
@@ -115,6 +121,7 @@ class HeightmapView
 		
 		var heightmapFolder = shaderGUI.addFolder("Height Map");
 		add(heightmapFolder, heightMapUniforms.time, "value", "time").step(0.025).listen().onChange(updateValues);
+		add(heightmapFolder, heightMapUniforms.noiseContribution, "value", "noise contribution").step(0.025).listen().onChange(updateValues);
 		
 		var heightmapScaleFolder = heightmapFolder.addFolder("scale");
 		heightmapScaleFolder.add(heightMapUniforms.scale.value, "x").step(0.025).listen().onChange(updateValues);
@@ -162,6 +169,7 @@ class HeightmapView
 	private var camera:OrthographicCamera = null;
 	private var scene:Scene = null;
 	
+	public var heightMapTexture(get, never):Texture;
 	private var heightMap:WebGLRenderTarget = null;
 	private var normalMap:WebGLRenderTarget = null;
 	
@@ -182,17 +190,14 @@ class HeightmapView
 	
 	public var dirty:Bool = true;
 	
-	public function new(renderer:WebGLRenderer) {
+	public function new(renderer:WebGLRenderer, width:Int, height:Int ) {
 		this.renderer = renderer;
 		
 		// Setup scene (render target)
 		scene = new Scene();
 		
-		// Height and normal maps
-		var rx = 256;
-		var ry = 256;
-		
-		camera = new OrthographicCamera(rx / -2, rx / 2, ry / 2, ry / -2, -10000, 10000);
+		// Height and normal maps		
+		camera = new OrthographicCamera(width / -2, width / 2, height / 2, height / -2, -10000, 10000);
 		camera.position.z = 100;
 		scene.add(camera);
 		
@@ -200,14 +205,31 @@ class HeightmapView
 		var rgbFormat = 1022;
 		var pars = { minFilter: linearFilter, magFilter: linearFilter, format: rgbFormat };
 		
-		heightMap = new WebGLRenderTarget(rx, ry, cast pars);
+		heightMap = new WebGLRenderTarget(width, height, cast pars);
 		heightMap.texture.generateMipmaps = false;
 		
-		normalMap = new WebGLRenderTarget(rx, ry, cast pars);
+		var heightMapSize = width * height * 4;
+		var heightMapData = new Uint8Array(heightMapSize);
+		for(i in 0...heightMapSize) {
+			var v = 0;
+		}
+		var rgbaFormat = cast 1023;
+		var unsignedByteType = cast 1009;
+		var uvmapping = cast 300;
+		var repeatWrapping = cast 1000;
+		var nearestFilter = cast 1003;
+		var heightMapInputTexture = new DataTexture(heightMapData, 4, 4, rgbaFormat, unsignedByteType, uvmapping, repeatWrapping, repeatWrapping, nearestFilter, nearestFilter);
+		heightMapInputTexture.needsUpdate = true;
+		
+		// Heightmap shader uniforms
+		heightMapUniforms.heightMap.value = heightMapInputTexture;
+		
+		normalMap = new WebGLRenderTarget(width, height, cast pars);
 		normalMap.texture.generateMipmaps = false;
-
+		
+		// Normal shader uniforms
 		normalUniforms.height.value = 0.05;
-		normalUniforms.resolution.value.set(rx, ry);
+		normalUniforms.resolution.value.set(width, height);
 		normalUniforms.heightMap.value = heightMap.texture;
 		
 		// Textures
@@ -223,7 +245,7 @@ class HeightmapView
 		diffuseTexture1.wrapS = diffuseTexture1.wrapT = repeatWrapping;
 		diffuseTexture2.wrapS = diffuseTexture2.wrapT = repeatWrapping;
 		detailTexture.wrapS = detailTexture.wrapT = repeatWrapping;
-
+		
 		// Terrain shader
 		terrainUniforms.tNormal.value = normalMap.texture;
 		terrainUniforms.uNormalScale.value = 3.5;
@@ -239,7 +261,7 @@ class HeightmapView
 		normalShaderMaterial = new ShaderMaterial({ vertexShader: NormalShader.vertex, fragmentShader: NormalShader.fragment, uniforms: normalUniforms, lights: false, fog: false });
 		terrainShaderMaterial = new ShaderMaterial({ vertexShader: TerrainShader.vertex, fragmentShader: TerrainShader.fragment, uniforms: terrainUniforms, lights: false, fog: false });
 		
-		var plane = new PlaneBufferGeometry(rx, ry);
+		var plane = new PlaneBufferGeometry(width, height);
 		quadTarget = new Mesh(cast plane, new MeshBasicMaterial({ color: 0x000000 }));
 		quadTarget.position.z = -500;
 		scene.add(quadTarget);
@@ -253,7 +275,6 @@ class HeightmapView
 		}
 		
 		// TODO only render if heightmap is changed/dirty...
-		
 		animDelta = Math.max(Math.min(animDelta + 0.00075 * animDeltaDir, 0), 0.05);
 		
 		// Update height map uniforms
@@ -277,5 +298,12 @@ class HeightmapView
 		// Update terrain shader uniforms
 		terrainUniforms.uNormalScale.value = js.three.Math.mapLinear(0.5, 0, 1, 0.6, 3.5);
 		terrainUniforms.uOffset.value.x = 4 * heightMapUniforms.offset.value.x;
+	}
+	
+	public function get_heightMapTexture():Texture {
+		if (heightMap == null) {
+			return null;
+		}
+		return heightMap.texture;
 	}
 }

@@ -1,6 +1,5 @@
 package;
 
-import js.dat.GUI;
 import game.actualizers.HumanRoamActualizer;
 import game.actualizers.ZombieRoamActualizer;
 import game.world.World;

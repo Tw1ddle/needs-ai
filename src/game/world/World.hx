@@ -30,9 +30,11 @@ import js.three.Vector3;
 import js.three.WebGLRenderer;
 import macrotween.Ease;
 import macrotween.Tween;
+import js.three.DataTexture;
 import needs.util.Signal.Signal1;
 import needs.util.Signal.Signal5;
 import ui.HeightmapView;
+import js.html.Uint8Array;
 
 // Represents the visual representation of an object in the world
 class ShapeMesh {
@@ -59,7 +61,10 @@ class World {
 	public var container(default, null):DivElement = null;
 	private var renderer:WebGLRenderer = null;
 	private var scene:Scene = null;
+	
 	private var heightmapView:HeightmapView = null;
+	private var heightMapInputTexture:DataTexture = null;
+	
 	private var labels:TextLabels = null;
 	public var utteranceManager(default, null):UtteranceManager = null;
 	
@@ -123,11 +128,11 @@ class World {
 		
 		var gridSize = Std.int(Math.max(logicalWorld.width, logicalWorld.height));
 		var grid = new GridHelper(gridSize, gridSize); // Note the grid is square-shaped
-		//scene.add(grid);
+		scene.add(grid);
 		
 		// Heightmap visualization
-		heightmapView = new HeightmapView(renderer);
-		var geometryTerrain = new PlaneBufferGeometry(gridSize * 2, gridSize * 2, gridSize * 3, gridSize * 3);
+		heightmapView = new HeightmapView(renderer, logicalWorld.width, logicalWorld.height);
+		var geometryTerrain = new PlaneBufferGeometry(gridSize, gridSize, gridSize, gridSize);
 		untyped THREE.BufferGeometryUtils.computeTangents(geometryTerrain);
 		var terrain = new Mesh(cast geometryTerrain, heightmapView.terrainShaderMaterial);
 		terrain.rotation.x = -Math.PI / 2;
