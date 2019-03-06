@@ -74,7 +74,7 @@ class NormalShader
 	public static function makeUniforms():NormalShaderUniforms {
 		return {
 			height: { type: "f", value: 0.05 },
-			resolution: { type: "v2", value: new Vector2(256, 256) },
+			resolution: { type: "v2", value: new Vector2(50, 50) },
 			heightMap: { type: "t", value: null }
 		};
 	}
@@ -169,7 +169,8 @@ class HeightmapView
 	private var camera:OrthographicCamera = null;
 	private var scene:Scene = null;
 	
-	public var heightMapTexture(get, never):Texture;
+	public var heightMapInputTexture(default, null):Texture;
+	public var heightMapInputData(default, null):Uint8Array = null;
 	private var heightMap:WebGLRenderTarget = null;
 	private var normalMap:WebGLRenderTarget = null;
 	
@@ -209,16 +210,17 @@ class HeightmapView
 		heightMap.texture.generateMipmaps = false;
 		
 		var heightMapSize = width * height * 4;
-		var heightMapData = new Uint8Array(heightMapSize);
-		for(i in 0...heightMapSize) {
-			var v = 0;
+		heightMapInputData = new Uint8Array(heightMapSize);
+		for(i in 0...1000) {
+			heightMapInputData[i] = 0;
 		}
 		var rgbaFormat = cast 1023;
 		var unsignedByteType = cast 1009;
 		var uvmapping = cast 300;
 		var repeatWrapping = cast 1000;
 		var nearestFilter = cast 1003;
-		var heightMapInputTexture = new DataTexture(heightMapData, 4, 4, rgbaFormat, unsignedByteType, uvmapping, repeatWrapping, repeatWrapping, nearestFilter, nearestFilter);
+		
+		heightMapInputTexture = new DataTexture(heightMapInputData, width, height, rgbaFormat, unsignedByteType, uvmapping, repeatWrapping, repeatWrapping, nearestFilter, nearestFilter);
 		heightMapInputTexture.needsUpdate = true;
 		
 		// Heightmap shader uniforms
@@ -300,10 +302,11 @@ class HeightmapView
 		terrainUniforms.uOffset.value.x = 4 * heightMapUniforms.offset.value.x;
 	}
 	
-	public function get_heightMapTexture():Texture {
-		if (heightMap == null) {
-			return null;
-		}
-		return heightMap.texture;
+	public function setGridCell(x:Int, y:Int, v:Int):Void {
+		var idx = ((x + y * Std.int(heightMap.width)) * 4);
+		heightMapInputData[idx] = v;
+		heightMapInputData[idx + 1] = v;
+		heightMapInputData[idx + 2] = v;
+		heightMapInputData[idx + 3] = v;
 	}
 }

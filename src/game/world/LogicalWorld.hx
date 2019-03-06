@@ -16,10 +16,10 @@ class LogicalWorld {
 	public var width(default, null):Int;
 	public var height(default, null):Int;
 	
-	private var humans:Array<Human> = [];
-	private var zombies:Array<Zombie> = [];
-	private var healths:Array<HealthPickup> = [];
-	private var weapons:Array<Weapon> = [];
+	public var humans:Array<Human> = [];
+	public var zombies:Array<Zombie> = [];
+	public var healths:Array<HealthPickup> = [];
+	public var weapons:Array<Weapon> = [];
 	
 	public var onHumanAdded(default, null) = new Signal1<Human>();
 	public var onHumanRemoved(default, null) = new Signal1<Human>();

@@ -17,7 +17,7 @@ class WorldGenerator {
 	}
 	
 	public function create():World {
-		var world = new World("game", 50, 50);
+		var world = new World("game", 64, 64); // Note some rendering code may rely on power-of-two grid size
 		
 		return world;
 	}
@@ -74,8 +74,8 @@ class WorldGenerator {
 	}
 	
 	private function randomCell():{x:Int, y:Int} {
-		var rx = Std.int(Math.random() * 50 - 25);
-		var ry = Std.int(Math.random() * 50 - 25);
+		var rx = Std.int(Math.random() * 64 - 32);
+		var ry = Std.int(Math.random() * 64 - 32);
 		return {x:rx, y:ry};
 	}
 }
