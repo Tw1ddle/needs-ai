@@ -50,6 +50,10 @@ class Main {
 	private inline function resetGame():Void {
 		SpeechSynth.cancel(); // Silence anything being read from the last game
 		
+		if (world != null) {
+			world.destroy();
+		}
+		
 		if (console != null) {
 			console.clear();
 		} else {

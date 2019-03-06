@@ -11,6 +11,7 @@ import game.util.TextLabels;
 import game.util.UtteranceManager;
 import haxe.ds.ObjectMap;
 import js.Browser;
+import js.dat.GUI;
 import js.html.DivElement;
 import js.three.AmbientLight;
 import js.three.BoxGeometry;
@@ -61,6 +62,7 @@ class World {
 	private var scene:Scene = null;
 	
 	private var heightmapView:HeightmapView = null;
+	private var heightmapGUI:GUI = null;
 
 	private var labels:TextLabels = null;
 	public var utteranceManager(default, null):UtteranceManager = null;
@@ -242,6 +244,12 @@ class World {
 			label.x = -1000;
 			label.y = -1000;
 		});
+		
+		heightmapGUI = HeightmapGUI.addGUI(heightmapView);
+	}
+	
+	public function destroy():Void {
+		heightmapGUI.destroy();
 	}
 	
 	public function render(dt:Float):Void {
