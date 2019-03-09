@@ -195,7 +195,6 @@ class HeightmapView
 	private var heightMapShaderMaterial:ShaderMaterial = null;
 	private var normalShaderMaterial:ShaderMaterial = null;
 	
-	private var texturesLoaded:Bool = false;
 	public var terrainShaderMaterial(default, null):ShaderMaterial = null;
 	
 	public var dirty:Bool = true;
@@ -218,19 +217,8 @@ class HeightmapView
 		heightMap = new WebGLRenderTarget(width, height, cast pars);
 		heightMap.texture.generateMipmaps = false;
 		
-		var heightMapSize = width * height * 4;
-		heightMapInputData = new Uint8Array(heightMapSize);
-		for(i in 0...1000) {
-			heightMapInputData[i] = 0;
-		}
-		var rgbaFormat = cast 1023;
-		var unsignedByteType = cast 1009;
-		var uvmapping = cast 300;
-		var repeatWrapping = cast 1000;
-		var nearestFilter = cast 1003;
-		
-		heightMapInputTexture = new DataTexture(heightMapInputData, width, height, rgbaFormat, unsignedByteType, uvmapping, repeatWrapping, repeatWrapping, nearestFilter, nearestFilter);
-		heightMapInputTexture.needsUpdate = true;
+		heightMapInputData = new Uint8Array(width * height * 4);
+		heightMapInputTexture = makeDataTexture(heightMapInputData, width, height);
 		
 		// Heightmap shader uniforms
 		heightMapUniforms.heightMap.value = heightMapInputTexture;
@@ -244,13 +232,9 @@ class HeightmapView
 		normalUniforms.heightMap.value = heightMap.texture;
 		
 		// Textures
-		var loadingManager = new LoadingManager(function() {
-			texturesLoaded = true;
-		});
-		var textureLoader = new TextureLoader(loadingManager);
-		var diffuseTexture1 = textureLoader.load("assets/images/grasslight-big.jpg");
-		var diffuseTexture2 = textureLoader.load("assets/images/backgrounddetailed6.jpg");
-		var detailTexture = textureLoader.load("assets/images/grasslight-big-nm.jpg");
+		var diffuseTexture1 = makeRedTexture(64, 64);
+		var diffuseTexture2 = makeBlueTexture(64, 64);
+		var detailTexture = makeGreenTexture(64, 64);
 		
 		var repeatWrapping:js.three.Wrapping = cast 1000;
 		diffuseTexture1.wrapS = diffuseTexture1.wrapT = repeatWrapping;
@@ -278,17 +262,13 @@ class HeightmapView
 		scene.add(quadTarget);
 	}
 	
-	public function render(dt:Float) {
-		if (!texturesLoaded) {
-			return;
-		}
-		
+	public function render(dt:Float) {		
 		// TODO only render if heightmap is changed/dirty...
-		animDelta = Math.max(Math.min(animDelta + 0.00075 * animDeltaDir, 0), 0.05);
+		//animDelta = Math.max(Math.min(animDelta + 0.00075 * animDeltaDir, 0), 0.05);
 		
 		// Update height map uniforms
 		heightMapUniforms.time.value += dt * animDelta;
-		heightMapUniforms.offset.value.x += dt * 0.05;
+		//heightMapUniforms.offset.value.x += dt * 0.05;
 		
 		// Render height map
 		quadTarget.material = heightMapShaderMaterial;
@@ -315,5 +295,44 @@ class HeightmapView
 		heightMapInputData[idx + 1] = v;
 		heightMapInputData[idx + 2] = v;
 		heightMapInputData[idx + 3] = v;
+	}
+	
+	private static inline function makeDataTexture(data:Uint8Array, width:Int, height:Int):DataTexture {
+		var size = width * height * 4;
+		
+		var rgbaFormat = cast 1023;
+		var unsignedByteType = cast 1009;
+		var uvmapping = cast 300;
+		var repeatWrapping = cast 1000;
+		var nearestFilter = cast 1003;
+		
+		var t = new DataTexture(data, width, height, rgbaFormat, unsignedByteType, uvmapping, repeatWrapping, repeatWrapping, nearestFilter, nearestFilter);
+		t.needsUpdate = true;
+		return t;
+	}
+	
+	private static inline function makeRedTexture(width:Int, height:Int):DataTexture {
+		return makeColorTexture(width, height, 255, 0, 0, 128);
+	}
+	
+	private static inline function makeGreenTexture(width:Int, height:Int):DataTexture {
+		return makeColorTexture(width, height, 0, 255, 0, 128);
+	}
+	
+	private static inline function makeBlueTexture(width:Int, height:Int):DataTexture {
+		return makeColorTexture(width, height, 0, 0, 255, 128);
+	}
+	
+	private static inline function makeColorTexture(width:Int, height:Int, r:Int, g:Int, b:Int, a:Int):DataTexture {
+		var data = new Uint8Array(width * height * 4);
+		var i = 0;
+		while (i < data.length) {
+			data[i] = r;
+			data[i + 1] = g;
+			data[i + 2] = b;
+			data[i + 3] = a;
+			i += 4;
+		}
+		return makeDataTexture(data, width, height);
 	}
 }
