@@ -17,7 +17,6 @@ import js.three.AmbientLight;
 import js.three.BoxGeometry;
 import js.three.Color;
 import js.three.Geometry;
-import js.three.GridHelper;
 import js.three.Group;
 import js.three.Mesh;
 import js.three.MeshPhongMaterial;
@@ -109,7 +108,7 @@ class World {
 		
 		var aspect = containerWidth / containerHeight;
 		camera = new OrthographicCamera(-containerWidth / 2 * aspect, containerWidth / 2 * aspect, containerHeight / 2, -containerHeight / 2, 1, 10000);
-		camera.zoom = 50;
+		camera.zoom = 8;
 		camera.position.set(100, 100, 100);
 		camera.lookAt(scene.position);
 		camera.updateProjectionMatrix();
@@ -117,8 +116,7 @@ class World {
 		scene.add(camera);
 		
 		var controls = new OrbitControls(camera, renderer.domElement);
-		controls.maxPolarAngle = Math.PI / 2.2;
-		untyped controls.minZoom = 10;
+		untyped controls.minZoom = 8;
 		untyped controls.maxZoom = 100;
 		untyped controls.zoomSpeed = 5;
 		controls.enableKeys = false;

@@ -1,6 +1,5 @@
 package game.world;
 
-import game.actualizers.HumanRoamActualizer;
 import game.npcs.humans.Human;
 import game.npcs.zombies.EverydayZombie;
 import game.npcs.zombies.Zombie;
@@ -74,8 +73,8 @@ class WorldGenerator {
 	}
 	
 	private function randomCell():{x:Int, y:Int} {
-		var rx = Std.int(Math.random() * 64 - 32);
-		var ry = Std.int(Math.random() * 64 - 32);
+		var rx = Std.int(Math.random() * 32 - 16);
+		var ry = Std.int(Math.random() * 32 - 16);
 		return {x:rx, y:ry};
 	}
 }

@@ -63,8 +63,8 @@ class Main {
 		var generator = new WorldGenerator();
 		world = generator.create();
 		
-		humanTeamView = new ui.HumanTeamInfoView(world, getElement(ID.humanteaminfo));
-		zombieTeamView = new ui.ZombieTeamInfoView(world, getElement(ID.zombieteaminfo));
+		humanTeamView = new HumanTeamInfoView(world, getElement(ID.humanteaminfo));
+		zombieTeamView = new ZombieTeamInfoView(world, getElement(ID.zombieteaminfo));
 		
 		console.setupWorldSignals(world);
 		console.echo("Round starting...");

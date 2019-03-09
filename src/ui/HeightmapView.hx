@@ -256,6 +256,9 @@ class HeightmapView
 		normalShaderMaterial = new ShaderMaterial({ vertexShader: NormalShader.vertex, fragmentShader: NormalShader.fragment, uniforms: normalUniforms, lights: false, fog: false });
 		terrainShaderMaterial = new ShaderMaterial({ vertexShader: TerrainShader.vertex, fragmentShader: TerrainShader.fragment, uniforms: terrainUniforms, lights: false, fog: false });
 		
+		var doubleSided = cast 2;
+		terrainShaderMaterial.side = doubleSided;
+		
 		var plane = new PlaneBufferGeometry(width, height);
 		quadTarget = new Mesh(cast plane, new MeshBasicMaterial({ color: 0x000000 }));
 		quadTarget.position.z = -500;
