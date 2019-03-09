@@ -17,6 +17,7 @@ import js.three.Vector2;
 import js.three.WebGLRenderTarget;
 import js.three.WebGLRenderer;
 import needs.util.FileReader;
+import js.three.Vector4;
 
 class HeightmapGUI
 {
@@ -61,9 +62,10 @@ class HeightmapGUI
 		add(terrainFolder, terrainUniforms.uNormalScale, "value", "normal scale").step(0.025).listen().onChange(updateValues);
 		
 		var diffuseColorFolder = terrainFolder.addFolder("diffuse");
-		diffuseColorFolder.add(terrainUniforms.diffuse.value, "r").step(0.025).listen().onChange(updateValues);
-		diffuseColorFolder.add(terrainUniforms.diffuse.value, "g").step(0.025).listen().onChange(updateValues);
-		diffuseColorFolder.add(terrainUniforms.diffuse.value, "b").step(0.025).listen().onChange(updateValues);
+		diffuseColorFolder.add(terrainUniforms.diffuse.value, "x").step(0.025).listen().onChange(updateValues);
+		diffuseColorFolder.add(terrainUniforms.diffuse.value, "y").step(0.025).listen().onChange(updateValues);
+		diffuseColorFolder.add(terrainUniforms.diffuse.value, "z").step(0.025).listen().onChange(updateValues);
+		diffuseColorFolder.add(terrainUniforms.diffuse.value, "w").step(0.025).listen().onChange(updateValues);
 		
 		add(terrainFolder, terrainUniforms.opacity, "value", "opacity").step(0.025).listen().onChange(updateValues);
 		add(terrainFolder, terrainUniforms.uDisplacementBias, "value", "displacement bias").step(0.25).listen().onChange(updateValues);
@@ -106,7 +108,7 @@ typedef TerrainShaderUniforms = {
 	tDiffuse1: { type:String, value:Texture },
 	tDiffuse2: { type:String, value:Texture },
 	tDetail: { type:String, value:Texture },
-	diffuse: { type:String, value:Color },
+	diffuse: { type:String, value:Vector4 },
 	opacity: { type:String, value:Float },
 	uDisplacementBias: { type:String, value:Float },
 	uDisplacementScale: { type:String, value:Float },
@@ -161,7 +163,7 @@ class TerrainShader
 			tDiffuse1: { type: "t", value: null },
 			tDiffuse2: { type: "t", value: null },
 			tDetail: { type: "t", value: null },
-			diffuse: { type: "c", value: new Color(0xffffff) },
+			diffuse: { type: "v4", value: new Vector4(1, 1, 1, 1) },
 			opacity: { type: "f", value: 1 },
 			uDisplacementBias: { type: "f", value: 0.0 },
 			uDisplacementScale: { type: "f", value: 5 },
@@ -248,13 +250,13 @@ class HeightmapView
 		terrainUniforms.tDiffuse1.value = diffuseTexture1;
 		terrainUniforms.tDiffuse2.value = diffuseTexture2;
 		terrainUniforms.tDetail.value = detailTexture;
-		terrainUniforms.diffuse.value.setHex(0xffffff);
+		terrainUniforms.diffuse.value.set(1, 1, 1, 1);
 		terrainUniforms.uDisplacementScale.value = 5;
 		terrainUniforms.uRepeatOverlay.value.set(6, 6);
 		
 		heightMapShaderMaterial = new ShaderMaterial({ vertexShader: HeightmapShader.vertex, fragmentShader: HeightmapShader.fragment, uniforms: heightMapUniforms, lights: false, fog: false });
 		normalShaderMaterial = new ShaderMaterial({ vertexShader: NormalShader.vertex, fragmentShader: NormalShader.fragment, uniforms: normalUniforms, lights: false, fog: false });
-		terrainShaderMaterial = new ShaderMaterial({ vertexShader: TerrainShader.vertex, fragmentShader: TerrainShader.fragment, uniforms: terrainUniforms, lights: false, fog: false });
+		terrainShaderMaterial = new ShaderMaterial({ vertexShader: TerrainShader.vertex, fragmentShader: TerrainShader.fragment, uniforms: terrainUniforms, lights: false, fog: false, transparent: true });
 		
 		var doubleSided = cast 2;
 		terrainShaderMaterial.side = doubleSided;
