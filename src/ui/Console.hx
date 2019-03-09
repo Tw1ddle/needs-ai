@@ -2,14 +2,22 @@ package ui;
 
 import game.actualizers.Actualizer;
 import game.world.World;
+import js.Browser;
+import js.html.Element;
 import js.jquery.terminal.Terminal;
 import needs.util.Signal.Signal1;
+import Main;
 
 class Console
-{	
+{
+	private var terminalElement:Element = Browser.document.getElementById(ID.console);
+	
 	public var onConsoleCommandIssued(default, null) = new Signal1<String>();
 	
 	public function new() {
+		terminalElement.addEventListener('mousewheel', function(e) {
+			e.preventDefault();
+		}, false);
 	}
 	
 	public function setupWorldSignals(world:World):Void {
@@ -81,7 +89,7 @@ class Console
 			greetings: false,
 			name: '>',
 			scrollOnEcho: true
-		} );
+		});
 	}
 	
 	public function echo(s:String):Void {

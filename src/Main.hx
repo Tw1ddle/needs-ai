@@ -20,9 +20,9 @@ class Main {
 	private static var dt:Float = 0.0; // Frame delta time
 	
 	static public var world(default, null):World; // The game world
-	static public var console(default, null):ui.Console; // Console where game events and other info is echoed
-	static public var humanTeamView(default, null):ui.TeamInfoView; // View where info about the human team is displayed
-	static public var zombieTeamView(default, null):ui.TeamInfoView; // View where info about the zombie team is displayed
+	static public var console(default, null):Console; // Console where game events and other info is echoed
+	static public var humanTeamView(default, null):TeamInfoView; // View where info about the human team is displayed
+	static public var zombieTeamView(default, null):TeamInfoView; // View where info about the zombie team is displayed
 	
 	static public var takeTurnButton(default, null):AnchorElement = getElement(ID.playturn);
 	static public var skipTurnButton(default, null):AnchorElement = getElement(ID.skipturn);
