@@ -1,10 +1,8 @@
 package ui;
 
+import game.util.TextureHelpers;
 import js.dat.GUI;
 import js.html.Uint8Array;
-import js.three.Color;
-import js.three.DataTexture;
-import js.three.LoadingManager;
 import js.three.Mesh;
 import js.three.MeshBasicMaterial;
 import js.three.OrthographicCamera;
@@ -12,12 +10,11 @@ import js.three.PlaneBufferGeometry;
 import js.three.Scene;
 import js.three.ShaderMaterial;
 import js.three.Texture;
-import js.three.TextureLoader;
 import js.three.Vector2;
+import js.three.Vector4;
 import js.three.WebGLRenderTarget;
 import js.three.WebGLRenderer;
 import needs.util.FileReader;
-import js.three.Vector4;
 
 class HeightmapGUI
 {
@@ -174,12 +171,13 @@ class TerrainShader
 	}
 }
 
-class HeightmapView 
+class HeightmapView
 {	
 	private var renderer:WebGLRenderer = null;
 	private var camera:OrthographicCamera = null;
 	private var scene:Scene = null;
 	
+	public var terrainMesh(default, null):Mesh;
 	public var heightMapInputTexture(default, null):Texture;
 	public var heightMapInputData(default, null):Uint8Array = null;
 	private var heightMap:WebGLRenderTarget = null;
@@ -201,7 +199,7 @@ class HeightmapView
 	
 	public var dirty:Bool = true;
 	
-	public function new(renderer:WebGLRenderer, width:Int, height:Int ) {
+	public function new(renderer:WebGLRenderer, width:Int, height:Int) {		
 		this.renderer = renderer;
 		
 		// Setup scene (render target)
@@ -220,7 +218,7 @@ class HeightmapView
 		heightMap.texture.generateMipmaps = false;
 		
 		heightMapInputData = new Uint8Array(width * height * 4);
-		heightMapInputTexture = makeDataTexture(heightMapInputData, width, height);
+		heightMapInputTexture = TextureHelpers.makeDataTexture(heightMapInputData, width, height);
 		
 		// Heightmap shader uniforms
 		heightMapUniforms.heightMap.value = heightMapInputTexture;
@@ -234,9 +232,9 @@ class HeightmapView
 		normalUniforms.heightMap.value = heightMap.texture;
 		
 		// Textures
-		var diffuseTexture1 = makeRedTexture(64, 64);
-		var diffuseTexture2 = makeBlueTexture(64, 64);
-		var detailTexture = makeGreenTexture(64, 64);
+		var diffuseTexture1 = TextureHelpers.makeRedTexture(64, 64);
+		var diffuseTexture2 = TextureHelpers.makeBlueTexture(64, 64);
+		var detailTexture = TextureHelpers.makeGreenTexture(64, 64);
 		
 		var repeatWrapping:js.three.Wrapping = cast 1000;
 		diffuseTexture1.wrapS = diffuseTexture1.wrapT = repeatWrapping;
@@ -265,6 +263,10 @@ class HeightmapView
 		quadTarget = new Mesh(cast plane, new MeshBasicMaterial({ color: 0x000000 }));
 		quadTarget.position.z = -500;
 		scene.add(quadTarget);
+		
+		var terrainMeshGeometry = new PlaneBufferGeometry(width, height, width, height);
+		untyped THREE.BufferGeometryUtils.computeTangents(terrainMeshGeometry);
+		terrainMesh = new Mesh(cast terrainMeshGeometry, terrainShaderMaterial);
 	}
 	
 	public function render(dt:Float) {		
@@ -300,44 +302,5 @@ class HeightmapView
 		heightMapInputData[idx + 1] = v;
 		heightMapInputData[idx + 2] = v;
 		heightMapInputData[idx + 3] = v;
-	}
-	
-	private static inline function makeDataTexture(data:Uint8Array, width:Int, height:Int):DataTexture {
-		var size = width * height * 4;
-		
-		var rgbaFormat = cast 1023;
-		var unsignedByteType = cast 1009;
-		var uvmapping = cast 300;
-		var repeatWrapping = cast 1000;
-		var nearestFilter = cast 1003;
-		
-		var t = new DataTexture(data, width, height, rgbaFormat, unsignedByteType, uvmapping, repeatWrapping, repeatWrapping, nearestFilter, nearestFilter);
-		t.needsUpdate = true;
-		return t;
-	}
-	
-	private static inline function makeRedTexture(width:Int, height:Int):DataTexture {
-		return makeColorTexture(width, height, 255, 0, 0, 128);
-	}
-	
-	private static inline function makeGreenTexture(width:Int, height:Int):DataTexture {
-		return makeColorTexture(width, height, 0, 255, 0, 128);
-	}
-	
-	private static inline function makeBlueTexture(width:Int, height:Int):DataTexture {
-		return makeColorTexture(width, height, 0, 0, 255, 128);
-	}
-	
-	private static inline function makeColorTexture(width:Int, height:Int, r:Int, g:Int, b:Int, a:Int):DataTexture {
-		var data = new Uint8Array(width * height * 4);
-		var i = 0;
-		while (i < data.length) {
-			data[i] = r;
-			data[i + 1] = g;
-			data[i + 2] = b;
-			data[i + 3] = a;
-			i += 4;
-		}
-		return makeDataTexture(data, width, height);
 	}
 }

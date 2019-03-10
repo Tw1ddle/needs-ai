@@ -2,11 +2,13 @@ package;
 
 import game.actualizers.HumanRoamActualizer;
 import game.actualizers.ZombieRoamActualizer;
+import game.world.InfluenceMaps;
 import game.world.World;
 import game.world.WorldGenerator;
 import js.Browser;
 import js.html.AnchorElement;
 import ui.Console;
+import ui.HeightmapViewStack;
 import ui.HumanTeamInfoView;
 import ui.TeamInfoView;
 import ui.ZombieTeamInfoView;
@@ -20,6 +22,7 @@ class Main {
 	private static var dt:Float = 0.0; // Frame delta time
 	
 	static public var world(default, null):World; // The game world
+	static public var influenceMaps(default, null):InfluenceMaps; // Collection of influence maps e.g. human, zombie presence measures etc
 	static public var console(default, null):Console; // Console where game events and other info is echoed
 	static public var humanTeamView(default, null):TeamInfoView; // View where info about the human team is displayed
 	static public var zombieTeamView(default, null):TeamInfoView; // View where info about the zombie team is displayed
@@ -49,10 +52,6 @@ class Main {
 	**/
 	private inline function resetGame():Void {
 		SpeechSynth.cancel(); // Silence anything being read from the last game
-		
-		if (world != null) {
-			world.destroy();
-		}
 		
 		if (console != null) {
 			console.clear();
@@ -94,6 +93,11 @@ class Main {
 		for (weapon in weapons) {
 			world.logicalWorld.addWeaponPickup(weapon);
 		}
+		
+		if (influenceMaps != null) {
+			influenceMaps.destroy();
+		}
+		influenceMaps = new InfluenceMaps(world);
 	}
 	
 	/*
@@ -101,6 +105,8 @@ class Main {
 	 */
 	private inline function render(dt:Float):Void {
 		world.render(dt);
+		
+		influenceMaps.update(dt);
 	}
 	
 	/**

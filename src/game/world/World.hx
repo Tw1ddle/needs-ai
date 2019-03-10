@@ -59,9 +59,6 @@ class World {
 	public var container(default, null):DivElement = null;
 	private var renderer:WebGLRenderer = null;
 	private var scene:Scene = null;
-	
-	private var heightmapView:HeightmapView = null;
-	private var heightmapGUI:GUI = null;
 
 	private var labels:TextLabels = null;
 	public var utteranceManager(default, null):UtteranceManager = null;
@@ -126,16 +123,6 @@ class World {
 		var gridSize = Std.int(Math.max(widthInCells, heightInCells));
 		//var grid = new GridHelper(gridSize, gridSize); // Note the grid is square-shaped
 		//scene.add(grid);
-		
-		// Heightmap visualization
-		heightmapView = new HeightmapView(renderer, widthInCells, heightInCells);
-		var geometryTerrain = new PlaneBufferGeometry(gridSize, gridSize, gridSize, gridSize);
-		untyped THREE.BufferGeometryUtils.computeTangents(geometryTerrain);
-		var terrain = new Mesh(cast geometryTerrain, heightmapView.terrainShaderMaterial);
-		terrain.rotation.x = -Math.PI / 2;
-		terrain.position.y = -5;
-		
-		scene.add(terrain);
 		
 		scene.add(npcGroup);
 		scene.add(pickupGroup);
@@ -242,12 +229,6 @@ class World {
 			label.x = -1000;
 			label.y = -1000;
 		});
-		
-		heightmapGUI = HeightmapGUI.addGUI(heightmapView);
-	}
-	
-	public function destroy():Void {
-		heightmapGUI.destroy();
 	}
 	
 	public function render(dt:Float):Void {
@@ -265,9 +246,6 @@ class World {
 		for (pickup in pickups) {
 			pickup.updateForRendering(dt);
 		}
-		
-		updateHeightmap(dt);
-		heightmapView.render(dt);
 		
 		renderer.render(scene, camera);
 	}
@@ -332,51 +310,5 @@ class World {
 		npcMotionTweens.push(Tween.tween([ mesh.position.x => npc.x, mesh.position.z => npc.y ], 1, 0, Ease.expoInOut));
 		
 		onNPCMovementAnimationEnded.dispatch(npc);
-	}
-	
-	private function updateHeightmap(dt:Float):Void {
-		var data = heightmapView.heightMapInputData;
-		if (data == null) {
-			return;
-		}
-		
-		// Fadeout
-		for (i in 0...data.length) {
-			if (data[i] > 0) {
-				data[i]--;
-			}
-		}
-		
-		for (npc in npcs.keys()) {
-			var x = Std.int(npc.x + logicalWorld.width / 2);
-			var y = Std.int(logicalWorld.height) - Std.int(npc.y + logicalWorld.height / 2);
-
-			heightmapView.setGridCell(x, y, 255);
-			heightmapView.setGridCell(x + 1, y, 255);
-			heightmapView.setGridCell(x - 1, y, 255);
-			heightmapView.setGridCell(x, y + 1, 255);
-			heightmapView.setGridCell(x, y - 1, 255);
-			heightmapView.setGridCell(x + 1, y - 1, 255);
-			heightmapView.setGridCell(x - 1, y + 1, 255);
-			heightmapView.setGridCell(x + 1, y + 1, 255);
-			heightmapView.setGridCell(x - 1, y - 1, 255);
-		}
-		
-		for (pickup in pickups.keys()) {
-			var x = Std.int(pickup.x + logicalWorld.width / 2);
-			var y = Std.int(logicalWorld.height) - Std.int(pickup.y + logicalWorld.height / 2);
-
-			heightmapView.setGridCell(x, y, 255);
-			heightmapView.setGridCell(x + 1, y, 255);
-			heightmapView.setGridCell(x - 1, y, 255);
-			heightmapView.setGridCell(x, y + 1, 255);
-			heightmapView.setGridCell(x, y - 1, 255);
-			heightmapView.setGridCell(x + 1, y - 1, 255);
-			heightmapView.setGridCell(x - 1, y + 1, 255);
-			heightmapView.setGridCell(x + 1, y + 1, 255);
-			heightmapView.setGridCell(x - 1, y - 1, 255);
-		}
-		
-		heightmapView.heightMapInputTexture.needsUpdate = true;
 	}
 }

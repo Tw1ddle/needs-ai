@@ -7,7 +7,6 @@ import game.npcs.humans.Human;
 import game.npcs.zombies.Zombie;
 import game.pickups.health.HealthPickup;
 import game.pickups.weapons.Weapon;
-import game.util.PresenceField;
 import needs.util.Signal.Signal1;
 import needs.util.Signal.Signal2;
 
@@ -52,21 +51,11 @@ class LogicalWorld {
 	public var preUpdate(default, null) = new Signal1<Int>();
 	public var postUpdate(default, null) = new Signal1<Int>();
 	
-	public var humanPresence(default, null):PresenceField;
-	public var zombiePresence(default, null):PresenceField;
-	public var healthPresence(default, null):PresenceField;
-	public var weaponPresence(default, null):PresenceField;
-	
 	public var chatterer(default, null):ChatterDirector;
 	
 	public function new(world:World, width:Int, height:Int) {
 		this.width = width;
 		this.height = height;
-		
-		humanPresence = new PresenceField(width, height);
-		zombiePresence = new PresenceField(width, height);
-		weaponPresence = new PresenceField(width, height);
-		healthPresence = new PresenceField(width, height);
 		
 		onHumanAdded.connect(world.onHumanAdded);
 		onHumanRemoved.connect(world.onHumanRemoved);
@@ -78,20 +67,6 @@ class LogicalWorld {
 		onHealthRemoved.connect(world.onHealthRemoved);
 		onWeaponAdded.connect(world.onWeaponAdded);
 		onWeaponRemoved.connect(world.onWeaponRemoved);
-		
-		onHumanAdded.connect(humanPresence.onAdded);
-		onHumanRemoved.connect(humanPresence.onRemoved);
-		onHumanMoved.connect(humanPresence.onMoved);
-		
-		onZombieAdded.connect(zombiePresence.onAdded);
-		onZombieRemoved.connect(zombiePresence.onRemoved);
-		onZombieMoved.connect(zombiePresence.onMoved);
-		
-		onHealthAdded.connect((who, what)-> { healthPresence.onAdded(what); });
-		onHealthRemoved.connect((who, what)-> { healthPresence.onRemoved(what); });
-		
-		onWeaponAdded.connect((who, what)-> { weaponPresence.onAdded(what); });
-		onWeaponRemoved.connect((who, what)-> { weaponPresence.onRemoved(what); });
 		
 		chatterer = new ChatterDirector(world);
 		chatterer.onUtteranceChanged.connect((before, after)-> {
