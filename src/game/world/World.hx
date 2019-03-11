@@ -11,19 +11,18 @@ import game.util.TextLabels;
 import game.util.UtteranceManager;
 import haxe.ds.ObjectMap;
 import js.Browser;
-import js.dat.GUI;
 import js.html.DivElement;
 import js.three.AmbientLight;
 import js.three.BoxGeometry;
 import js.three.Color;
 import js.three.Geometry;
+import js.three.GridHelper;
 import js.three.Group;
 import js.three.Mesh;
 import js.three.MeshPhongMaterial;
 import js.three.Object3D;
 import js.three.OrbitControls;
 import js.three.OrthographicCamera;
-import js.three.PlaneBufferGeometry;
 import js.three.PointLight;
 import js.three.Scene;
 import js.three.Vector3;
@@ -32,7 +31,6 @@ import macrotween.Ease;
 import macrotween.Tween;
 import needs.util.Signal.Signal1;
 import needs.util.Signal.Signal5;
-import ui.HeightmapView;
 
 // Represents the visual representation of an object in the world
 class ShapeMesh {
@@ -87,8 +85,8 @@ class World {
 		canvas.width = containerWidth;
 		canvas.height = containerHeight;
 		
-		renderer = new WebGLRenderer({canvas:canvas, antialias:true});
-		renderer.sortObjects = true;
+		renderer = new WebGLRenderer({canvas:canvas, antialias:false});
+		renderer.sortObjects = false;
 		renderer.setPixelRatio(Browser.window.devicePixelRatio);
 		renderer.setSize(containerWidth, containerHeight);
 		
@@ -121,8 +119,8 @@ class World {
 		logicalWorld = new LogicalWorld(this, widthInCells, heightInCells);
 		
 		var gridSize = Std.int(Math.max(widthInCells, heightInCells));
-		//var grid = new GridHelper(gridSize, gridSize); // Note the grid is square-shaped
-		//scene.add(grid);
+		var grid = new GridHelper(gridSize, gridSize); // Note the grid is square-shaped
+		scene.add(grid);
 		
 		scene.add(npcGroup);
 		scene.add(pickupGroup);

@@ -1,6 +1,7 @@
 package ui;
 
 import game.util.TextureHelpers;
+import game.world.HeightmapId;
 import js.dat.GUI;
 import js.html.Uint8Array;
 import js.three.Mesh;
@@ -20,7 +21,11 @@ class HeightmapGUI
 {
 	@:access(ui.HeightmapView)
 	public static function addGUI(v:HeightmapView):GUI {
-		var gui = new GUI( { autoPlace:true } );
+		var root = new GUI( { autoPlace:true } );
+		root.domElement.id = v.id;
+		
+		var gui = root.addFolder("Heightmap: " + v.id);
+		
 		var heightMapUniforms = v.heightMapUniforms;
 		var normalUniforms = v.normalUniforms;
 		var terrainUniforms = v.terrainUniforms;
@@ -80,7 +85,7 @@ class HeightmapGUI
 		offsetFolder.add(terrainUniforms.uOffset.value, "x").step(0.025).listen().onChange(updateValues);
 	    offsetFolder.add(terrainUniforms.uOffset.value, "y").step(0.025).listen().onChange(updateValues);
 		
-		return gui;
+		return root;
 	}
 }
 
@@ -174,6 +179,7 @@ class TerrainShader
 class HeightmapView
 {	
 	private var renderer:WebGLRenderer = null;
+	private var id:HeightmapId;
 	private var camera:OrthographicCamera = null;
 	private var scene:Scene = null;
 	
@@ -199,8 +205,9 @@ class HeightmapView
 	
 	public var dirty:Bool = true;
 	
-	public function new(renderer:WebGLRenderer, width:Int, height:Int) {		
+	public function new(renderer:WebGLRenderer, id:HeightmapId, width:Int, height:Int) {		
 		this.renderer = renderer;
+		this.id = id;
 		
 		// Setup scene (render target)
 		scene = new Scene();
@@ -269,13 +276,17 @@ class HeightmapView
 		terrainMesh = new Mesh(cast terrainMeshGeometry, terrainShaderMaterial);
 	}
 	
+	public dynamic function update(dt:Float) {
+		
+	}
+	
 	public function render(dt:Float) {		
-		// TODO only render if heightmap is changed/dirty...
-		//animDelta = Math.max(Math.min(animDelta + 0.00075 * animDeltaDir, 0), 0.05);
+		// TODO if no noise/fading then only render if heightmap is changed/dirty...
+		animDelta = Math.max(Math.min(animDelta + 0.00075 * animDeltaDir, 0), 0.05);
 		
 		// Update height map uniforms
 		heightMapUniforms.time.value += dt * animDelta;
-		//heightMapUniforms.offset.value.x += dt * 0.05;
+		heightMapUniforms.offset.value.x += dt * 0.05;
 		
 		// Render height map
 		quadTarget.material = heightMapShaderMaterial;

@@ -1,5 +1,7 @@
 package js.dat;
 
+import js.html.Element;
+
 @:native("dat.GUI")
 extern class GUI {
 	// GUI
@@ -23,6 +25,7 @@ extern class GUI {
 	public function saveAs(presetName:String):GUI;
 	public function revert(gui:GUI):GUI;
 	public function listen(?controller:Dynamic):GUI;
+	public var domElement:Element;
 	
 	// FunctionController
 	public function fire():GUI;

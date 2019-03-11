@@ -15,7 +15,7 @@ class HumanStateView extends NpcStateView
 	private var pastActionsExpander:LIElement = null;
 	private var actualActionsList:UListElement = null;
 
-	public function new(npc:Human, teamInfoView:ui.HumanTeamInfoView) {
+	public function new(npc:Human, teamInfoView:HumanTeamInfoView) {
 		super(npc, teamInfoView);
 		
 		npc.onActionChanged.connect(function(before:Action<NpcActionId, NpcConsiderationId, InputId>, after:Action<NpcActionId, NpcConsiderationId, InputId>) {
