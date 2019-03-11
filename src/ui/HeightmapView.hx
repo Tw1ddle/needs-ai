@@ -1,7 +1,7 @@
 package ui;
 
 import game.util.TextureHelpers;
-import game.world.HeightmapId;
+import game.world.InfluenceMapId;
 import js.dat.GUI;
 import js.html.Uint8Array;
 import js.three.Mesh;
@@ -179,10 +179,10 @@ class TerrainShader
 class HeightmapView
 {	
 	private var renderer:WebGLRenderer = null;
-	private var id:HeightmapId;
 	private var camera:OrthographicCamera = null;
 	private var scene:Scene = null;
 	
+	public var id(default, null):InfluenceMapId;
 	public var terrainMesh(default, null):Mesh;
 	public var heightMapInputTexture(default, null):Texture;
 	public var heightMapInputData(default, null):Uint8Array = null;
@@ -203,9 +203,10 @@ class HeightmapView
 	
 	public var terrainShaderMaterial(default, null):ShaderMaterial = null;
 	
+	public var renderEnabled:Bool = true;
 	public var dirty:Bool = true;
 	
-	public function new(renderer:WebGLRenderer, id:HeightmapId, width:Int, height:Int) {		
+	public function new(renderer:WebGLRenderer, id:InfluenceMapId, width:Int, height:Int) {		
 		this.renderer = renderer;
 		this.id = id;
 		
@@ -280,7 +281,11 @@ class HeightmapView
 		
 	}
 	
-	public function render(dt:Float) {		
+	public function render(dt:Float) {
+		if (!renderEnabled) {
+			return;
+		}
+		
 		// TODO if no noise/fading then only render if heightmap is changed/dirty...
 		animDelta = Math.max(Math.min(animDelta + 0.00075 * animDeltaDir, 0), 0.05);
 		

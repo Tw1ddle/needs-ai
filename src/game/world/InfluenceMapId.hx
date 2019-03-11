@@ -1,6 +1,6 @@
 package game.world;
 
-@:enum abstract HeightmapId(String) from String to String
+@:enum abstract InfluenceMapId(String) from String to String
 {
 	var HUMANS = "humans";
 	var ZOMBIES = "zombies";
