@@ -86,7 +86,7 @@ class World {
 		canvas.height = containerHeight;
 		
 		renderer = new WebGLRenderer({canvas:canvas, antialias:false});
-		renderer.sortObjects = false;
+		renderer.sortObjects = true;
 		renderer.setPixelRatio(Browser.window.devicePixelRatio);
 		renderer.setSize(containerWidth, containerHeight);
 		
