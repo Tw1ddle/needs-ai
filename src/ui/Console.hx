@@ -51,6 +51,14 @@ class Console
 			echo(who.name + " is thinking...");
 		});
 		
+		world.logicalWorld.onNPCMoved.connect((who, oldX, oldY, newX, newY)-> {
+			echo(who.name + " moved from continuous position (" + oldX + ", " + oldY + ") to (" + newX + ", " + newY + ")");
+		});
+		
+		world.logicalWorld.onNPCMovedOnWorldGrid.onChanged.connect((who, oldX, oldY, oldGridX, oldGridY, newGridX, newGridY)-> {
+			echo(who.name + " moved from grid position (" + oldGridX + ", " + oldGridY + ") to (" + newGridX + ", " + newGridY + ")");
+		});
+		
 		world.logicalWorld.onNPCActedIdly.connect((who)-> {
 			echo(who.name + " acted on desires for " +  stringifyActualizers(who.fallbackActualizers) + ", as they could not think of what else to do.");
 		});

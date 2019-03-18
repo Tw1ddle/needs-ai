@@ -78,6 +78,10 @@ class LogicalWorld {
 		onHumanMovedOnWorldGrid = new QuantizedMovementObserver<Human>(1, 1, onHumanMoved);
 		onZombieMovedOnWorldGrid = new QuantizedMovementObserver<Zombie>(1, 1, onZombieMoved);
 		
+		onNPCMovedOnWorldGrid.onChanged.connect(world.onNPCMovedOnWorldGrid);
+		onHumanMovedOnWorldGrid.onChanged.connect(world.onHumanMovedOnWorldGrid);
+		onZombieMovedOnWorldGrid.onChanged.connect(world.onZombieMovedOnWorldGrid);
+		
 		chatterer = new ChatterDirector(world);
 		chatterer.onUtteranceChanged.connect((before, after)-> {
 			

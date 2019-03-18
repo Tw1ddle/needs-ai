@@ -92,9 +92,13 @@ class NPC implements Positionable implements Brainable implements Nameable {
 	}
 	
 	public function setPosition(x:Float, y:Float):Void {
+		var oldX = this.x;
+		var oldY = this.y;
+		
 		this.x = x;
 		this.y = y;
-		onMoved.dispatch(x, y, this.x, this.y);
+		
+		onMoved.dispatch(oldX, oldY, x, y);
 	}
 	
 	public function addBrain(brain:Brain<NpcBrainId, NpcReasonerId, NpcActionSetId, NpcActionId, NpcConsiderationId, InputId>):Void {

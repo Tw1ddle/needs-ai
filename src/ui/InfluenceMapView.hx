@@ -3,7 +3,7 @@ package ui;
 import game.world.InfluenceMap;
 import js.dat.GUI;
 
-class InfluenceMapGUI
+class InfluenceMapView
 {
 	@:access(game.world.InfluenceMap)
 	public static function addGUI(v:InfluenceMap):GUI {

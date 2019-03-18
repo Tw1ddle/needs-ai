@@ -37,7 +37,7 @@ class InfluenceMaps
 	public function add(influenceMap:InfluenceMap) {
 		influenceMapViews.add(influenceMap);
 		
-		guis.push(ui.InfluenceMapGUI.addGUI(influenceMap));
+		guis.push(ui.InfluenceMapView.addGUI(influenceMap));
 		
 		var button:ButtonElement = Browser.document.createButtonElement();
 		button.id = influenceMap.id;

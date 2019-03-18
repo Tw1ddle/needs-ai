@@ -7,7 +7,6 @@ import game.pickups.Pickup;
 import game.pickups.health.HealthPickup;
 import game.pickups.weapons.Weapon;
 import game.util.IntersectionChecker;
-import game.util.QuantizedMovementObserver;
 import game.util.TextLabels;
 import game.util.UtteranceManager;
 import haxe.ds.ObjectMap;
@@ -251,6 +250,18 @@ class World {
 	
 	public function onNPCMoved(npc:NPC, oldX:Float, oldY:Float, newX:Float, newY:Float):Void {
 		startNPCMovementAnimation(npc);
+	}
+	
+	public function onNPCMovedOnWorldGrid(npc:NPC, oldX:Float, oldY:Float, oldGridX:Float, oldGridY:Float, newGridX:Float, newGridY:Float):Void {
+		
+	}
+	
+	public function onHumanMovedOnWorldGrid(human:Human, oldX:Float, oldY:Float, oldGridX:Float, oldGridY:Float, newGridX:Float, newGridY:Float):Void {
+		
+	}
+	
+	public function onZombieMovedOnWorldGrid(zombie:Zombie, oldX:Float, oldY:Float, oldGridX:Float, oldGridY:Float, newGridX:Float, newGridY:Float):Void {
+		
 	}
 	
 	public function onHumanAdded(human:Human):Void {
