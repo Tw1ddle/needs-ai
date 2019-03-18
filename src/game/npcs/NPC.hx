@@ -15,6 +15,7 @@ import haxe.ds.StringMap;
 import needs.ai.Brain;
 import needs.util.Signal.Signal1;
 import needs.util.Signal.Signal2;
+import needs.util.Signal.Signal4;
 
 // TODO things to add:
 
@@ -51,7 +52,7 @@ class NPC implements Positionable implements Brainable implements Nameable {
 	public var actualizers(default, null):Array<Actualizer> = [];
 	public var fallbackActualizers(default, null):Array<Actualizer> = []; // Idle activity
 	
-	public var onMoved = new Signal2<Float, Float>();
+	public var onMoved = new Signal4<Float, Float, Float, Float>();
 	
 	public var onThinked = new Signal1<NPC>();
 	public var onActedIdly = new Signal1<NPC>();
@@ -93,7 +94,7 @@ class NPC implements Positionable implements Brainable implements Nameable {
 	public function setPosition(x:Float, y:Float):Void {
 		this.x = x;
 		this.y = y;
-		onMoved.dispatch(this.x, this.y);
+		onMoved.dispatch(x, y, this.x, this.y);
 	}
 	
 	public function addBrain(brain:Brain<NpcBrainId, NpcReasonerId, NpcActionSetId, NpcActionId, NpcConsiderationId, InputId>):Void {

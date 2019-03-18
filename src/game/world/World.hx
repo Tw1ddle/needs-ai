@@ -7,6 +7,7 @@ import game.pickups.Pickup;
 import game.pickups.health.HealthPickup;
 import game.pickups.weapons.Weapon;
 import game.util.IntersectionChecker;
+import game.util.QuantizedMovementObserver;
 import game.util.TextLabels;
 import game.util.UtteranceManager;
 import haxe.ds.ObjectMap;
@@ -248,7 +249,7 @@ class World {
 		renderer.render(scene, camera);
 	}
 	
-	public function onNPCMoved(npc:NPC):Void {
+	public function onNPCMoved(npc:NPC, oldX:Float, oldY:Float, newX:Float, newY:Float):Void {
 		startNPCMovementAnimation(npc);
 	}
 	

@@ -101,6 +101,8 @@ class InfluenceMaps
 		return influenceMap;
 	}
 	
+	// TODO generate stamps for npcs/humans etc
+	
 	private function updateHumansInfluenceMap(dt:Float, influenceMap:InfluenceMap):Void {
 		var logicalWorld = world.logicalWorld;
 		

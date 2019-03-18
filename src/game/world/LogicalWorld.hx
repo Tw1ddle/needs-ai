@@ -7,8 +7,10 @@ import game.npcs.humans.Human;
 import game.npcs.zombies.Zombie;
 import game.pickups.health.HealthPickup;
 import game.pickups.weapons.Weapon;
+import game.util.QuantizedMovementObserver;
 import needs.util.Signal.Signal1;
 import needs.util.Signal.Signal2;
+import needs.util.Signal.Signal5;
 
 // Represents the logical state of the world
 class LogicalWorld {
@@ -25,9 +27,13 @@ class LogicalWorld {
 	public var onZombieAdded(default, null) = new Signal1<Zombie>();
 	public var onZombieRemoved(default, null) = new Signal1<Zombie>();
 	
-	public var onNPCMoved(default, null) = new Signal1<NPC>();
-	public var onHumanMoved(default, null) = new Signal1<Human>();
-	public var onZombieMoved(default, null) = new Signal1<Zombie>();
+	public var onNPCMoved(default, null) = new Signal5<NPC, Float, Float, Float, Float>();
+	public var onHumanMoved(default, null) = new Signal5<Human, Float, Float, Float, Float>();
+	public var onZombieMoved(default, null) = new Signal5<Zombie, Float, Float, Float, Float>();
+	
+	public var onNPCMovedOnWorldGrid(default, null):QuantizedMovementObserver<NPC> = null;
+	public var onHumanMovedOnWorldGrid(default, null):QuantizedMovementObserver<Human> = null;
+	public var onZombieMovedOnWorldGrid(default, null):QuantizedMovementObserver<Zombie> = null;
 	
 	public var onNPCThinked(default, null) = new Signal1<NPC>();
 	public var onHumanThinked(default, null) = new Signal1<Human>();
@@ -67,6 +73,10 @@ class LogicalWorld {
 		onHealthRemoved.connect(world.onHealthRemoved);
 		onWeaponAdded.connect(world.onWeaponAdded);
 		onWeaponRemoved.connect(world.onWeaponRemoved);
+		
+	    onNPCMovedOnWorldGrid = new QuantizedMovementObserver<NPC>(1, 1, onNPCMoved);
+		onHumanMovedOnWorldGrid = new QuantizedMovementObserver<Human>(1, 1, onHumanMoved);
+		onZombieMovedOnWorldGrid = new QuantizedMovementObserver<Zombie>(1, 1, onZombieMoved);
 		
 		chatterer = new ChatterDirector(world);
 		chatterer.onUtteranceChanged.connect((before, after)-> {
@@ -126,7 +136,7 @@ class LogicalWorld {
 	
 	public function addHuman(human:Human) {
 		humans.push(human);
-		human.onMoved.connect((x, y)-> { onNPCMoved.dispatch(human); onHumanMoved.dispatch(human); });
+		human.onMoved.connect((oldX, oldY, newX, newY)-> { onNPCMoved.dispatch(human, oldX, oldY, newX, newY); onHumanMoved.dispatch(human, oldX, oldY, newX, newY); });
 		human.onThinked.connect((who)-> { onNPCThinked.dispatch(human); onHumanThinked.dispatch(human); });
 		human.onActed.connect((who)-> { onNPCActed.dispatch(human); onHumanActed.dispatch(human); });
 		human.onActedIdly.connect((who)-> { onNPCActedIdly.dispatch(human); onHumanActedIdly.dispatch(human); });
@@ -144,7 +154,7 @@ class LogicalWorld {
 	
 	public function addZombie(zombie:Zombie) {
 		zombies.push(zombie);
-		zombie.onMoved.connect((x, y)-> { onNPCMoved.dispatch(zombie); onZombieMoved.dispatch(zombie); });
+		zombie.onMoved.connect((oldX, oldY, newX, newY)-> { onNPCMoved.dispatch(zombie, oldX, oldY, newX, newY); onZombieMoved.dispatch(zombie, oldX, oldY, newX, newY); });
 		zombie.onThinked.connect((who)-> { onNPCThinked.dispatch(zombie); onZombieThinked.dispatch(zombie); });
 		zombie.onActed.connect((who)-> { onNPCActed.dispatch(zombie); onZombieActed.dispatch(zombie); });
 		zombie.onActedIdly.connect((who)-> { onNPCActedIdly.dispatch(zombie); onZombieActedIdly.dispatch(zombie); });
