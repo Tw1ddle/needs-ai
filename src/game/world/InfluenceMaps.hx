@@ -1,19 +1,19 @@
 package game.world;
 
+import game.world.InfluenceMap;
+import game.world.InfluenceMapStack;
 import game.world.World;
 import js.Browser;
 import js.dat.GUI;
 import js.html.ButtonElement;
 import js.html.Element;
-import ui.HeightmapView;
-import ui.HeightmapViewStack;
 import Main;
 
 @:access(game.world.World)
 class InfluenceMaps 
 {
 	private var world:World;
-	private var heightmapViews:HeightmapViewStack;
+	private var influenceMapViews:InfluenceMapStack;
 	
 	private var guis:Array<GUI> = [];
 	private var buttonContainer:Element = Browser.document.getElementById(ID.influencemapbuttoncontainer);
@@ -21,12 +21,12 @@ class InfluenceMaps
 	
 	public function new(world:World) {
 		this.world = world;
-		this.heightmapViews = new HeightmapViewStack(world);
+		this.influenceMapViews = new InfluenceMapStack(world);
 		
-		var humanMap = makeHeightmap(InfluenceMapId.HUMANS, 25, updateHumansHeightmap);
-		var zombieMap = makeHeightmap(InfluenceMapId.ZOMBIES, 15, updateZombiesHeightmap);
-		var healthMap = makeHeightmap(InfluenceMapId.HEALTHPICKUPS, -15, updateHealthHeightmap);
-		var weaponMap = makeHeightmap(InfluenceMapId.WEAPONPICKUPS, -25, updateWeaponsHeightmap);
+		var humanMap = makeInfluenceMap(InfluenceMapId.HUMANS, 25, updateHumansInfluenceMap);
+		var zombieMap = makeInfluenceMap(InfluenceMapId.ZOMBIES, 15, updateZombiesInfluenceMap);
+		var healthMap = makeInfluenceMap(InfluenceMapId.HEALTHPICKUPS, -15, updateHealthInfluenceMap);
+		var weaponMap = makeInfluenceMap(InfluenceMapId.WEAPONPICKUPS, -25, updateWeaponsInfluenceMap);
 		
 		add(humanMap);
 		add(zombieMap);
@@ -34,20 +34,20 @@ class InfluenceMaps
 		add(weaponMap);
 	}
 	
-	public function add(heightmap:HeightmapView) {
-		heightmapViews.add(heightmap);
+	public function add(influenceMap:InfluenceMap) {
+		influenceMapViews.add(influenceMap);
 		
-		guis.push(HeightmapGUI.addGUI(heightmap));
+		guis.push(ui.InfluenceMapGUI.addGUI(influenceMap));
 		
 		var button:ButtonElement = Browser.document.createButtonElement();
-		button.id = heightmap.id;
+		button.id = influenceMap.id;
 		button.className = "button";
 		button.innerHTML = "<h2>" + button.id + "</h2>";
 		button.addEventListener("click", function(e) {
-			for (heightmap in heightmapViews.heightmaps) {
-				if (heightmap.id == button.id) {
-					heightmap.renderEnabled = !heightmap.renderEnabled;
-					heightmap.terrainMesh.visible = !heightmap.terrainMesh.visible;
+			for (influenceMap in influenceMapViews.influenceMaps) {
+				if (influenceMap.id == button.id) {
+					influenceMap.renderEnabled = !influenceMap.renderEnabled;
+					influenceMap.influenceMesh.visible = !influenceMap.influenceMesh.visible;
 				}
 			}
 		});
@@ -57,9 +57,9 @@ class InfluenceMaps
 	}
 	
 	public function remove(id:InfluenceMapId) {
-		for (heightmap in heightmapViews.heightmaps) {
-			if (heightmap.id == id) {
-				heightmapViews.heightmaps.remove(heightmap);
+		for (influenceMap in influenceMapViews.influenceMaps) {
+			if (influenceMap.id == id) {
+				influenceMapViews.influenceMaps.remove(influenceMap);
 			}
 		}
 		for (gui in guis) {
@@ -76,7 +76,7 @@ class InfluenceMaps
 	}
 	
 	public function update(dt:Float):Void {
-		heightmapViews.update(dt);
+		influenceMapViews.update(dt);
 	}
 	
 	public function destroy():Void {
@@ -90,22 +90,22 @@ class InfluenceMaps
 		buttons = [];
 	}
 	
-	private function makeHeightmap(id:InfluenceMapId, zPosition:Int, updateFunction:Float->HeightmapView->Void):HeightmapView {
-		// Heightmap visualization
-		var heightmap = new HeightmapView(world.renderer, id, world.logicalWorld.width, world.logicalWorld.height);
+	private function makeInfluenceMap(id:InfluenceMapId, zPosition:Int, updateFunction:Float->InfluenceMap->Void):InfluenceMap {
+		// influenceMap visualization
+		var influenceMap = new InfluenceMap(world.renderer, id, world.logicalWorld.width, world.logicalWorld.height);
 		
-		heightmap.terrainMesh.rotation.x = -Math.PI / 2;
-		heightmap.terrainMesh.position.y = zPosition;
-		heightmap.update = updateFunction.bind(_, heightmap);
+		influenceMap.influenceMesh.rotation.x = -Math.PI / 2;
+		influenceMap.influenceMesh.position.y = zPosition;
+		influenceMap.update = updateFunction.bind(_, influenceMap);
 		
-		return heightmap;
+		return influenceMap;
 	}
 	
-	private function updateHumansHeightmap(dt:Float, heightmap:HeightmapView):Void {
+	private function updateHumansInfluenceMap(dt:Float, influenceMap:InfluenceMap):Void {
 		var logicalWorld = world.logicalWorld;
 		
 		// Fadeout
-		//var data = heightmap.heightMapInputData;
+		//var data = influenceMap.influenceMapInputData;
 		//for (i in 0...data.length) {
 		//	if (data[i] > 0) {
 		//		data[i]--;
@@ -116,25 +116,25 @@ class InfluenceMaps
 			var x = Std.int(npc.x + logicalWorld.width / 2);
 			var y = Std.int(logicalWorld.height) - Std.int(npc.y + logicalWorld.height / 2);
 
-			heightmap.setGridCell(x, y, 255);
-			heightmap.setGridCell(x + 1, y, 255);
-			heightmap.setGridCell(x - 1, y, 255);
-			heightmap.setGridCell(x, y + 1, 255);
-			heightmap.setGridCell(x, y - 1, 255);
-			heightmap.setGridCell(x + 1, y - 1, 255);
-			heightmap.setGridCell(x - 1, y + 1, 255);
-			heightmap.setGridCell(x + 1, y + 1, 255);
-			heightmap.setGridCell(x - 1, y - 1, 255);
+			influenceMap.setGridCell(x, y, 255);
+			influenceMap.setGridCell(x + 1, y, 255);
+			influenceMap.setGridCell(x - 1, y, 255);
+			influenceMap.setGridCell(x, y + 1, 255);
+			influenceMap.setGridCell(x, y - 1, 255);
+			influenceMap.setGridCell(x + 1, y - 1, 255);
+			influenceMap.setGridCell(x - 1, y + 1, 255);
+			influenceMap.setGridCell(x + 1, y + 1, 255);
+			influenceMap.setGridCell(x - 1, y - 1, 255);
 		}
 		
-		heightmap.heightMapInputTexture.needsUpdate = true;
+		influenceMap.influenceMapInputTexture.needsUpdate = true;
 	}
 	
-	private function updateZombiesHeightmap(dt:Float, heightmap:HeightmapView):Void {
+	private function updateZombiesInfluenceMap(dt:Float, influenceMap:InfluenceMap):Void {
 		var logicalWorld = world.logicalWorld;
 		
 		// Fadeout
-		//var data = heightmap.heightMapInputData;
+		//var data = influenceMap.influenceMapInputData;
 		//for (i in 0...data.length) {
 		//	if (data[i] > 0) {
 		//		data[i]--;
@@ -145,59 +145,59 @@ class InfluenceMaps
 			var x = Std.int(npc.x + logicalWorld.width / 2);
 			var y = Std.int(logicalWorld.height) - Std.int(npc.y + logicalWorld.height / 2);
 
-			heightmap.setGridCell(x, y, 255);
-			heightmap.setGridCell(x + 1, y, 255);
-			heightmap.setGridCell(x - 1, y, 255);
-			heightmap.setGridCell(x, y + 1, 255);
-			heightmap.setGridCell(x, y - 1, 255);
-			heightmap.setGridCell(x + 1, y - 1, 255);
-			heightmap.setGridCell(x - 1, y + 1, 255);
-			heightmap.setGridCell(x + 1, y + 1, 255);
-			heightmap.setGridCell(x - 1, y - 1, 255);
+			influenceMap.setGridCell(x, y, 255);
+			influenceMap.setGridCell(x + 1, y, 255);
+			influenceMap.setGridCell(x - 1, y, 255);
+			influenceMap.setGridCell(x, y + 1, 255);
+			influenceMap.setGridCell(x, y - 1, 255);
+			influenceMap.setGridCell(x + 1, y - 1, 255);
+			influenceMap.setGridCell(x - 1, y + 1, 255);
+			influenceMap.setGridCell(x + 1, y + 1, 255);
+			influenceMap.setGridCell(x - 1, y - 1, 255);
 		}
 		
-		heightmap.heightMapInputTexture.needsUpdate = true;
+		influenceMap.influenceMapInputTexture.needsUpdate = true;
 	}
 	
-	private function updateHealthHeightmap(dt:Float, heightmap:HeightmapView):Void {
+	private function updateHealthInfluenceMap(dt:Float, influenceMap:InfluenceMap):Void {
 		var logicalWorld = world.logicalWorld;
 		
 		for (pickup in logicalWorld.healths) {
 			var x = Std.int(pickup.x + logicalWorld.width / 2);
 			var y = Std.int(logicalWorld.height) - Std.int(pickup.y + logicalWorld.height / 2);
 
-			heightmap.setGridCell(x, y, 255);
-			heightmap.setGridCell(x + 1, y, 255);
-			heightmap.setGridCell(x - 1, y, 255);
-			heightmap.setGridCell(x, y + 1, 255);
-			heightmap.setGridCell(x, y - 1, 255);
-			heightmap.setGridCell(x + 1, y - 1, 255);
-			heightmap.setGridCell(x - 1, y + 1, 255);
-			heightmap.setGridCell(x + 1, y + 1, 255);
-			heightmap.setGridCell(x - 1, y - 1, 255);
+			influenceMap.setGridCell(x, y, 255);
+			influenceMap.setGridCell(x + 1, y, 255);
+			influenceMap.setGridCell(x - 1, y, 255);
+			influenceMap.setGridCell(x, y + 1, 255);
+			influenceMap.setGridCell(x, y - 1, 255);
+			influenceMap.setGridCell(x + 1, y - 1, 255);
+			influenceMap.setGridCell(x - 1, y + 1, 255);
+			influenceMap.setGridCell(x + 1, y + 1, 255);
+			influenceMap.setGridCell(x - 1, y - 1, 255);
 		}
 		
-		heightmap.heightMapInputTexture.needsUpdate = true;
+		influenceMap.influenceMapInputTexture.needsUpdate = true;
 	}
 
-	private function updateWeaponsHeightmap(dt:Float, heightmap:HeightmapView):Void {
+	private function updateWeaponsInfluenceMap(dt:Float, influenceMap:InfluenceMap):Void {
 		var logicalWorld = world.logicalWorld;
 		
 		for (pickup in logicalWorld.weapons) {
 			var x = Std.int(pickup.x + logicalWorld.width / 2);
 			var y = Std.int(logicalWorld.height) - Std.int(pickup.y + logicalWorld.height / 2);
 
-			heightmap.setGridCell(x, y, 255);
-			heightmap.setGridCell(x + 1, y, 255);
-			heightmap.setGridCell(x - 1, y, 255);
-			heightmap.setGridCell(x, y + 1, 255);
-			heightmap.setGridCell(x, y - 1, 255);
-			heightmap.setGridCell(x + 1, y - 1, 255);
-			heightmap.setGridCell(x - 1, y + 1, 255);
-			heightmap.setGridCell(x + 1, y + 1, 255);
-			heightmap.setGridCell(x - 1, y - 1, 255);
+			influenceMap.setGridCell(x, y, 255);
+			influenceMap.setGridCell(x + 1, y, 255);
+			influenceMap.setGridCell(x - 1, y, 255);
+			influenceMap.setGridCell(x, y + 1, 255);
+			influenceMap.setGridCell(x, y - 1, 255);
+			influenceMap.setGridCell(x + 1, y - 1, 255);
+			influenceMap.setGridCell(x - 1, y + 1, 255);
+			influenceMap.setGridCell(x + 1, y + 1, 255);
+			influenceMap.setGridCell(x - 1, y - 1, 255);
 		}
 		
-		heightmap.heightMapInputTexture.needsUpdate = true;
+		influenceMap.influenceMapInputTexture.needsUpdate = true;
 	}
 }

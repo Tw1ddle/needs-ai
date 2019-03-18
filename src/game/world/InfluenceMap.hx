@@ -1,8 +1,7 @@
-package ui;
+package game.world;
 
 import game.util.TextureHelpers;
 import game.world.InfluenceMapId;
-import js.dat.GUI;
 import js.html.Uint8Array;
 import js.three.Mesh;
 import js.three.MeshBasicMaterial;
@@ -16,78 +15,6 @@ import js.three.Vector4;
 import js.three.WebGLRenderTarget;
 import js.three.WebGLRenderer;
 import needs.util.FileReader;
-
-class HeightmapGUI
-{
-	@:access(ui.HeightmapView)
-	public static function addGUI(v:HeightmapView):GUI {
-		var root = new GUI( { autoPlace:true } );
-		root.domElement.id = v.id;
-		
-		var gui = root.addFolder("Heightmap: " + v.id);
-		
-		var heightMapUniforms = v.heightMapUniforms;
-		var normalUniforms = v.normalUniforms;
-		var terrainUniforms = v.terrainUniforms;
-		
-		var updateValues = function(t:Dynamic) {
-			
-		};
-		
-		var add = function(parent:GUI, object:Dynamic, fieldName:String, folderName:String, step:Float = 0.025) {
-			var folder = parent.addFolder(folderName);
-			return folder.add(object, fieldName).step(step).listen().onChange(updateValues);
-		}
-		
-		var heightmapFolder = gui.addFolder("Height Map");
-		add(heightmapFolder, heightMapUniforms.time, "value", "time").step(0.025).listen().onChange(updateValues);
-		add(heightmapFolder, heightMapUniforms.noiseContribution, "value", "noise contribution").step(0.025).listen().onChange(updateValues);
-		
-		var heightmapScaleFolder = heightmapFolder.addFolder("scale");
-		heightmapScaleFolder.add(heightMapUniforms.scale.value, "x").step(0.025).listen().onChange(updateValues);
-		heightmapScaleFolder.add(heightMapUniforms.scale.value, "y").step(0.025).listen().onChange(updateValues);
-		
-		var heightmapOffsetFolder = heightmapFolder.addFolder("offset");
-		heightmapOffsetFolder.add(heightMapUniforms.offset.value, "x").step(0.025).listen().onChange(updateValues);
-		heightmapOffsetFolder.add(heightMapUniforms.offset.value, "y").step(0.025).listen().onChange(updateValues);
-		
-		
-		var normalmapFolder = gui.addFolder("Normal Map");
-		add(normalmapFolder, normalUniforms.height, "value", "height").step(0.025).listen().onChange(updateValues);
-		
-		var normalmapResolutionFolder = normalmapFolder.addFolder("resolution");
-		normalmapResolutionFolder.add(normalUniforms.resolution.value, "x").step(0.025).listen().onChange(updateValues);
-		normalmapResolutionFolder.add(normalUniforms.resolution.value, "y").step(0.025).listen().onChange(updateValues);
-		
-		
-		var terrainFolder = gui.addFolder("Terrain");
-		add(terrainFolder, terrainUniforms.uNormalScale, "value", "normal scale").step(0.025).listen().onChange(updateValues);
-		
-		var diffuseColorFolder = terrainFolder.addFolder("diffuse");
-		diffuseColorFolder.add(terrainUniforms.diffuse.value, "x").step(0.025).listen().onChange(updateValues);
-		diffuseColorFolder.add(terrainUniforms.diffuse.value, "y").step(0.025).listen().onChange(updateValues);
-		diffuseColorFolder.add(terrainUniforms.diffuse.value, "z").step(0.025).listen().onChange(updateValues);
-		diffuseColorFolder.add(terrainUniforms.diffuse.value, "w").step(0.025).listen().onChange(updateValues);
-		
-		add(terrainFolder, terrainUniforms.opacity, "value", "opacity").step(0.025).listen().onChange(updateValues);
-		add(terrainFolder, terrainUniforms.uDisplacementBias, "value", "displacement bias").step(0.25).listen().onChange(updateValues);
-		add(terrainFolder, terrainUniforms.uDisplacementScale, "value", "displacement scale").step(0.25).listen().onChange(updateValues);
-		
-		var repeatBaseFolder = terrainFolder.addFolder("repeatBase");
-		repeatBaseFolder.add(terrainUniforms.uRepeatBase.value, "x").step(0.025).listen().onChange(updateValues);
-		repeatBaseFolder.add(terrainUniforms.uRepeatBase.value, "y").step(0.025).listen().onChange(updateValues);
-		
-		var repeatOverlayFolder = terrainFolder.addFolder("repeatOverlay");
-		repeatOverlayFolder.add(terrainUniforms.uRepeatOverlay.value, "x").step(0.025).listen().onChange(updateValues);
-		repeatOverlayFolder.add(terrainUniforms.uRepeatOverlay.value, "y").step(0.025).listen().onChange(updateValues);
-		
-		var offsetFolder = terrainFolder.addFolder("offset");
-		offsetFolder.add(terrainUniforms.uOffset.value, "x").step(0.025).listen().onChange(updateValues);
-	    offsetFolder.add(terrainUniforms.uOffset.value, "y").step(0.025).listen().onChange(updateValues);
-		
-		return root;
-	}
-}
 
 typedef HeightmapShaderUniforms = {
 	heightMap: { type:String, value:Texture },
@@ -103,7 +30,7 @@ typedef NormalShaderUniforms = {
 	heightMap: { type:String, value:Texture }
 }
 
-typedef TerrainShaderUniforms = {
+typedef InfluenceMapShaderUniforms = {
 	tNormal: { type:String, value:Texture },
 	uNormalScale: { type:String, value:Float },
 	tDisplacement: { type:String, value:Texture },
@@ -151,13 +78,13 @@ class NormalShader
 	}
 }
 
-// Shader that renders textured terrain from the normalmap texture
-class TerrainShader
+// Shader that renders an influence map from the normalmap texture
+class InfluenceMapShader
 {
-	public static var vertex(default, null):String = FileReader.readFileAsString("../embed/shaders/terrain.vert");
-	public static var fragment(default, null):String = FileReader.readFileAsString("../embed/shaders/terrain.frag");
+	public static var vertex(default, null):String = FileReader.readFileAsString("../embed/shaders/influencemap.vert");
+	public static var fragment(default, null):String = FileReader.readFileAsString("../embed/shaders/influencemap.frag");
 	
-	public static function makeUniforms():TerrainShaderUniforms {
+	public static function makeUniforms():InfluenceMapShaderUniforms {
 		return {
 			tNormal: { type: "t", value: null },
 			uNormalScale: { type: "f", value: 3.5 },
@@ -176,16 +103,16 @@ class TerrainShader
 	}
 }
 
-class HeightmapView
+class InfluenceMap
 {	
 	private var renderer:WebGLRenderer = null;
 	private var camera:OrthographicCamera = null;
 	private var scene:Scene = null;
 	
 	public var id(default, null):InfluenceMapId;
-	public var terrainMesh(default, null):Mesh;
-	public var heightMapInputTexture(default, null):Texture;
-	public var heightMapInputData(default, null):Uint8Array = null;
+	public var influenceMesh(default, null):Mesh;
+	public var influenceMapInputTexture(default, null):Texture;
+	public var influenceMapInputData(default, null):Uint8Array = null;
 	private var heightMap:WebGLRenderTarget = null;
 	private var normalMap:WebGLRenderTarget = null;
 	
@@ -196,17 +123,17 @@ class HeightmapView
 	
 	private var heightMapUniforms:HeightmapShaderUniforms = HeightmapShader.makeUniforms();
 	private var normalUniforms:NormalShaderUniforms = NormalShader.makeUniforms();
-	private var terrainUniforms:TerrainShaderUniforms = TerrainShader.makeUniforms();
+	private var influenceUniforms:InfluenceMapShaderUniforms = InfluenceMapShader.makeUniforms();
 	
 	private var heightMapShaderMaterial:ShaderMaterial = null;
 	private var normalShaderMaterial:ShaderMaterial = null;
 	
-	public var terrainShaderMaterial(default, null):ShaderMaterial = null;
+	public var influenceMapShaderMaterial(default, null):ShaderMaterial = null;
 	
 	public var renderEnabled:Bool = true;
 	public var dirty:Bool = true;
 	
-	public function new(renderer:WebGLRenderer, id:InfluenceMapId, width:Int, height:Int) {		
+	public function new(renderer:WebGLRenderer, id:InfluenceMapId, width:Int, height:Int) {
 		this.renderer = renderer;
 		this.id = id;
 		
@@ -225,11 +152,11 @@ class HeightmapView
 		heightMap = new WebGLRenderTarget(width, height, cast pars);
 		heightMap.texture.generateMipmaps = false;
 		
-		heightMapInputData = new Uint8Array(width * height * 4);
-		heightMapInputTexture = TextureHelpers.makeDataTexture(heightMapInputData, width, height);
+		influenceMapInputData = new Uint8Array(width * height * 4);
+		influenceMapInputTexture = TextureHelpers.makeDataTexture(influenceMapInputData, width, height);
 		
 		// Heightmap shader uniforms
-		heightMapUniforms.heightMap.value = heightMapInputTexture;
+		heightMapUniforms.heightMap.value = influenceMapInputTexture;
 		
 		normalMap = new WebGLRenderTarget(width, height, cast pars);
 		normalMap.texture.generateMipmaps = false;
@@ -249,32 +176,32 @@ class HeightmapView
 		diffuseTexture2.wrapS = diffuseTexture2.wrapT = repeatWrapping;
 		detailTexture.wrapS = detailTexture.wrapT = repeatWrapping;
 		
-		// Terrain shader
-		terrainUniforms.tNormal.value = normalMap.texture;
-		terrainUniforms.uNormalScale.value = 3.5;
-		terrainUniforms.tDisplacement.value = heightMap.texture;
-		terrainUniforms.tDiffuse1.value = diffuseTexture1;
-		terrainUniforms.tDiffuse2.value = diffuseTexture2;
-		terrainUniforms.tDetail.value = detailTexture;
-		terrainUniforms.diffuse.value.set(1, 1, 1, 1);
-		terrainUniforms.uDisplacementScale.value = 5;
-		terrainUniforms.uRepeatOverlay.value.set(6, 6);
+		// Influence map shader
+		influenceUniforms.tNormal.value = normalMap.texture;
+		influenceUniforms.uNormalScale.value = 3.5;
+		influenceUniforms.tDisplacement.value = heightMap.texture;
+		influenceUniforms.tDiffuse1.value = diffuseTexture1;
+		influenceUniforms.tDiffuse2.value = diffuseTexture2;
+		influenceUniforms.tDetail.value = detailTexture;
+		influenceUniforms.diffuse.value.set(1, 1, 1, 1);
+		influenceUniforms.uDisplacementScale.value = 5;
+		influenceUniforms.uRepeatOverlay.value.set(6, 6);
 		
 		heightMapShaderMaterial = new ShaderMaterial({ vertexShader: HeightmapShader.vertex, fragmentShader: HeightmapShader.fragment, uniforms: heightMapUniforms, lights: false, fog: false });
 		normalShaderMaterial = new ShaderMaterial({ vertexShader: NormalShader.vertex, fragmentShader: NormalShader.fragment, uniforms: normalUniforms, lights: false, fog: false });
-		terrainShaderMaterial = new ShaderMaterial({ vertexShader: TerrainShader.vertex, fragmentShader: TerrainShader.fragment, uniforms: terrainUniforms, lights: false, fog: false, transparent: true });
+		influenceMapShaderMaterial = new ShaderMaterial({ vertexShader: InfluenceMapShader.vertex, fragmentShader: InfluenceMapShader.fragment, uniforms: influenceUniforms, lights: false, fog: false, transparent: true });
 		
 		var doubleSided = cast 2;
-		terrainShaderMaterial.side = doubleSided;
+		influenceMapShaderMaterial.side = doubleSided;
 		
 		var plane = new PlaneBufferGeometry(width, height);
 		quadTarget = new Mesh(cast plane, new MeshBasicMaterial({ color: 0x000000 }));
 		quadTarget.position.z = -500;
 		scene.add(quadTarget);
 		
-		var terrainMeshGeometry = new PlaneBufferGeometry(width, height, width, height);
-		untyped THREE.BufferGeometryUtils.computeTangents(terrainMeshGeometry);
-		terrainMesh = new Mesh(cast terrainMeshGeometry, terrainShaderMaterial);
+		var influenceMapMeshGeometry = new PlaneBufferGeometry(width, height, width, height);
+		untyped THREE.BufferGeometryUtils.computeTangents(influenceMapMeshGeometry);
+		influenceMesh = new Mesh(cast influenceMapMeshGeometry, influenceMapShaderMaterial);
 	}
 	
 	public dynamic function update(dt:Float) {
@@ -307,16 +234,16 @@ class HeightmapView
 		
 		renderer.setRenderTarget(null);
 		
-		// Update terrain shader uniforms
-		terrainUniforms.uNormalScale.value = js.three.Math.mapLinear(0.5, 0, 1, 0.6, 3.5);
-		terrainUniforms.uOffset.value.x = 4 * heightMapUniforms.offset.value.x;
+		// Update influence map shader uniforms
+		influenceUniforms.uNormalScale.value = js.three.Math.mapLinear(0.5, 0, 1, 0.6, 3.5);
+		influenceUniforms.uOffset.value.x = 4 * heightMapUniforms.offset.value.x;
 	}
 	
 	public function setGridCell(x:Int, y:Int, v:Int):Void {
 		var idx = ((x + y * Std.int(heightMap.width)) * 4);
-		heightMapInputData[idx] = v;
-		heightMapInputData[idx + 1] = v;
-		heightMapInputData[idx + 2] = v;
-		heightMapInputData[idx + 3] = v;
+		influenceMapInputData[idx] = v;
+		influenceMapInputData[idx + 1] = v;
+		influenceMapInputData[idx + 2] = v;
+		influenceMapInputData[idx + 3] = v;
 	}
 }

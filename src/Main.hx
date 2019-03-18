@@ -8,7 +8,7 @@ import game.world.WorldGenerator;
 import js.Browser;
 import js.html.AnchorElement;
 import ui.Console;
-import ui.HeightmapViewStack;
+import game.world.InfluenceMapStack;
 import ui.HumanTeamInfoView;
 import ui.TeamInfoView;
 import ui.ZombieTeamInfoView;
