@@ -1,7 +1,7 @@
 package game.util;
 
+import js.lib.Uint8Array;
 import js.three.DataTexture;
-import js.html.Uint8Array;
 
 class TextureHelpers 
 {

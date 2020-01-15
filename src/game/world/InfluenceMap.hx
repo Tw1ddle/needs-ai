@@ -2,7 +2,7 @@ package game.world;
 
 import game.util.TextureHelpers;
 import game.world.InfluenceMapId;
-import js.html.Uint8Array;
+import js.lib.Uint8Array;
 import js.three.Mesh;
 import js.three.MeshBasicMaterial;
 import js.three.OrthographicCamera;
