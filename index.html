@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en-GB" xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width,user-scalable=yes,initial-scale=1,maximum-scale=1">
+		<title>Needs AI - Utility Artificial Intelligence Demo Using Utility-Driven Agents</title>
+		<meta name="author" content="Sam Twidale">
+		<meta name="description" content="This utility based artificial intelligence game drives autonomous agents using utility-theory based logic.">
+		<meta name="keywords" content="artificial intelligence, AI, utility, utility theory, needs-based, needs AI, IAUS, utility systems">
+		<meta name="subject" content="Utility Based AI">
+		<meta name="robots" content="index, follow">
+		<link rel="canonical" href="https://www.samcodes.co.uk/project/needs-ai/" />
+		<meta property="og:title" content="Needs AI - Utility Based AI Demo">
+		<meta property="og:description" content="Demo that animates autonomous agents using utility-theory based AI">
+		<meta property="og:site_name" content="Samcodes">
+		<meta name="twitter:title" content="Needs AI - Utility Based AI Demo">
+		<meta name="twitter:description" content="Demo that animates autonomous agents using utility-theory based AI">
+		<link rel="icon" type="image/x-icon" href="icon/favicon.png">
+		<link rel="apple-touch-icon-precomposed" type="image/x-icon" href="icon/apple-touch-icon-precomposed.png">
+		<!--[if IE]><link rel="shortcut icon" type="image/x-icon" href="icon/favicon.ico"><![endif]-->
+		<link rel="stylesheet" type="text/css" href="css/jquery.terminal.css">
+		<link rel="stylesheet" type="text/css" href="css/style.min.css">
+	</head>
+	
+	<body>
+		<section id="header">
+			<div class="inner">
+				<h1>Needs AI</h1>
+				<h2>Utility based artificial intelligence</h2>
+				
+				<a href="https://github.com/Tw1ddle/needs-ai" target="_blank">
+					<img class="logo" src="https://github.com/Tw1ddle/needs-ai/blob/master/screenshots/logo.png?raw=true" alt="utility-based needs AI icon, artificial intelligence game and library logo">
+				</a>
+				
+				<p><a href="https://github.com/Tw1ddle/needs-ai" target="_blank">Needs AI</a> drives autonomous agents using <a href="https://en.wikipedia.org/wiki/Utility_system" target="_blank">utility-based</a> artificial intelligence. An <a href="https://github.com/Tw1ddle/needs-ai" target="_blank">open source</a> minigame by <a href="https://twitter.com/Sam_Twidale" target="_blank">Sam Twidale</a>.</p>
+				
+				<p>Survivors are green, zombies are red. Click the "Play Turn" button and watch the action unfold. The console panel at the bottom records events as they happen.</p>
+			</div>
+		</section>
+		
+		<br>
+		
+		<div class="container stitched topaligned">
+			
+			<a class="button" id="playturn">
+			    <h2>Play Turn</h2>
+			</a>
+		
+			<a class="button" id="skipturn">
+				<h2>Skip Turn</h2>
+			</a>
+			
+			<a class="button" id="restartgame">
+				<h2>Restart Game</h2>
+			</a>
+			
+		</div>
+		
+		<br>
+		
+		<div class="container stitched topaligned">
+			<h2>Humans</h2>
+			<div id="humanteaminfo">Loading...</div>
+		</div>
+		
+		<div class="container stitched">
+			<div id="game_wrapper">
+				<span id="game" oncontextmenu="return false;">Loading...</span>
+			</div>
+		</div>
+			
+		<div class="container stitched topaligned">
+			<h2>Zombies</h2>
+			<div id="zombieteaminfo">Loading...</div>
+		</div>
+				
+		<br>
+		
+		<div class="container stitched topaligned" id="influencemapbuttoncontainer">
+			<h2>Influence Maps</h2>
+			
+			<br>
+		
+		</div>
+		
+		<br>
+		
+		<div id="console"></div>
+		
+		<br>
+		
+		<div class="container stitched">
+			<h2>How It Works</h2>
+			<p>This page uses a <a href="https://en.wikipedia.org/wiki/Utility_system" target="_blank">utility AI</a> to manage a group of selfish humans who "cooperate" in battles against hordes of zombies. It's inspired by <a href="https://en.wikipedia.org/wiki/Zombie_Panic!_Source" target="_blank">Zombie Panic</a>.</p>
+			<p>Utility AI, where NPCs consider their own needs, produces agents that show an awareness of their environments and act autonomously, without the need for brittle scripting. The approach is tried and tested, and has worked in various commercial games, such as The Sims, Iron Man and Red Dead Redemption.</p>
+			<p>This <a href="https://github.com/Tw1ddle/needs-ai" target="_blank">implementation</a> has the following design: AI agents have Brains. Brains are top-level decision makers that tell agents what they should try to do. Brains contain Reasoners, which encapsulate logic for assessing the suitability of sets of game actions. Reasoners contain ActionSets, groups of actions. ActionSets consist of Actions, identifiers for actual activities an agent can perform in the game. Actions (also known as Options) contain Considerations, aspects that an agent must assess to decide whether to perform a game action. Finally, each Consideration (also known as an Axis) references an Input, a measurable aspect of the game world, and a technique for considering (evaluating) the Input.</p>
+			<p>When it is time to update the AI, an agent thinks using their Brain(s) to evaluate the current situation in the game world. The best scoring actions are chosen using a strategy encapsulated by the Reasoners and ActionSets within the Brains, with individual Actions being evaluated by scoring their associated Considerations. At this point the Actions are merely conceptual, so as the agent's Brains select new actions, a set of Intents are updated based on this. The presence of specific Intents activates or deactivates Actualizers, which are responsible for making the Intents of the agents concrete i.e. actualizing agent intentions.</p>
+			<p>A single agent can have more than one Brain. This is for handling separate sets of Actions that can be performed in parallel, such as walking and talking. In this demo, humans have one Brain for chattering with fellow survivors and taunting zombies, and another for core behaviours, such as handling weapons or fleeing from zombies.</p>
+			<p>Needs based AI requires careful balancing to produce the behaviours you want. For example, a human who has to decide whether to flee the undead has a Consideration based on the number of zombies in the vicinity, but how the Brain processes that information depends on where other survivors are, and how cowardly the survivor in question is.</p>
+			<p>Another area of interest is making Inputs (a view of some information in the world) available in an efficient way. To do this, you often need to provide generalized distances between objects, influence maps, elapsed times and other attributes. Scalability is easy to handle - you can perform triggered updates, make agents only use their Brains every so often, disallow Actions that take a lot of work to consider, or even tell agents to think less often when processing power is in short supply.</p>
+			<p>This utility AI demo was written using <a href="https://haxe.org/" target="_blank">Haxe</a>. For developers, there is a list of articles and useful references in the code repository <a href="https://github.com/Tw1ddle/needs-ai-lib#references" target="_blank">readme</a>. If you have any suggestions, requests or comments then <a href="https://twitter.com/Sam_Twidale" target="_blank">contact me</a> or open an <a href="https://github.com/Tw1ddle/needs-ai" target="_blank">issue</a>.</p>
+		</div>
+		
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/jquery.mousewheel.min.js"></script>
+		<script type="text/javascript" src="js/jquery.terminal.min.js"></script>
+		<script>
+			terminal = $('#console').terminal(function(command, term) {
+				term.echo('');
+			}, {
+				greetings: false,
+				name: 'dconsole',
+				height: "300",
+				prompt: '> ',
+			});
+			document.addEventListener('console_log', function(evt) {
+				terminal.echo(evt.detail.data, {
+					finalize: function(div) {
+						div.css("color", "#" + evt.detail.color);
+					}
+				});
+			});
+		</script>
+		<script src="js/dat.gui.min.js"></script>
+		<script src="js/three.min.js"></script>
+		<script src="js/BufferGeometryUtils.js"></script>
+		<script src="js/orbitcontrols.js"></script>
+		<script src="js/game.js"></script>
+	</body>
+</html>
